@@ -38,13 +38,13 @@ jobs:
 
       - name: Test Docker Compose
         run: |
-          docker-compose up -d
+          docker compose up -d
           sleep 15
           curl --fail http://localhost:8000/ || exit 1
           curl --fail http://localhost:5001/api/generate -X POST \
             -H "Content-Type: application/json" \
             -d '{"num_nodes": 3, "num_edges": 2, "algorithm": "none"}' || exit 1
-          docker-compose down
+          docker compose down
           echo "Docker Compose tested successfully"
 
       - name: Clean up Docker images
