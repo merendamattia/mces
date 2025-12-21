@@ -6,6 +6,8 @@ const statusEl = document.getElementById("status");
 const algoResults = document.getElementById("algo-results");
 const algBruteforce = document.getElementById("alg-bruteforce");
 const algArcmatch = document.getElementById("alg-bruteforce-arcmatch");
+const selectAllAlgorithms = document.getElementById("select-all-algorithms");
+const algoCheckboxes = document.querySelectorAll(".algo-checkbox");
 
 let lastGraph1 = null;
 let lastGraph2 = null;
@@ -52,6 +54,21 @@ async function handleGenerate() {
 
 generateBtn.addEventListener("click", handleGenerate);
 runMcesBtn.addEventListener("click", handleRunMces);
+
+// Select all algorithms handler
+selectAllAlgorithms.addEventListener("change", function() {
+  algoCheckboxes.forEach(cb => cb.checked = this.checked);
+});
+
+// Update select all state when individual checkboxes change
+algoCheckboxes.forEach(cb => {
+  cb.addEventListener("change", function() {
+    const allChecked = Array.from(algoCheckboxes).every(c => c.checked);
+    const someChecked = Array.from(algoCheckboxes).some(c => c.checked);
+    selectAllAlgorithms.checked = allChecked;
+    selectAllAlgorithms.indeterminate = someChecked && !allChecked;
+  });
+});
 
 // Initial render to show default parameters quickly.
 handleGenerate();
@@ -113,37 +130,48 @@ function renderAlgorithmResults(results) {
       const preservedCount = (result.preserved_edges || []).length;
       const stats = result.stats || {};
 
-      // Build stats table
-      const statsRows = Object.entries(stats)
+      // Build stats badges
+      const statsBadges = Object.entries(stats)
         .map(([k, v]) => {
-          const label = k.replace(/_/g, " ");
-          const value = typeof v === "number" ? (Number.isInteger(v) ? v : v.toFixed(2)) : v;
-          return `<tr><td>${label}</td><td>${value}</td></tr>`;
+          let label = k.replace(/_/g, " ");
+          let value = v;
+
+          // Convert time_ms to seconds with 3 decimals
+          if (k === "time_ms") {
+            label = "time";
+            value = (v / 1000).toFixed(3) + "s";
+          } else if (typeof v === "number") {
+            value = Number.isInteger(v) ? v : v.toFixed(2);
+          }
+
+          const icon = k === 'time_ms' ? 'clock' : k.includes('explored') ? 'search' : k.includes('recursive') ? 'arrow-repeat' : k.includes('pruned') ? 'scissors' : 'check-circle';
+          return `<span class="badge bg-secondary me-2 mb-2"><i class="bi bi-${icon}"></i> ${label}: <strong>${value}</strong></span>`;
         })
         .join("");
-      const statsTable = `<table class="stats-table"><tbody>${statsRows}</tbody></table>`;
 
-      return `<div class="result-card">
-        <h3 style="color: ${color}">${algoName}</h3>
-        <div class="result-content">
-          <div class="result-info">
-            <h4>Preserved Edges: <span class="highlight-value" style="color: ${color}">${preservedCount}</span></h4>
-            <div class="result-section">
-              <h5>Statistics</h5>
-              ${statsTable}
-            </div>
-          </div>
-          <div class="result-graphs">
-            <div class="graph-panel">
-              <h4>Graph 1</h4>
-              <div class="graph-canvas-container">
-                <svg id="${id1}" class="graph-canvas" role="img" aria-label="${algoName} Graph 1"></svg>
+      return `<div class="result-card card shadow-sm mb-4">
+        <div class="card-body">
+          <h3 class="card-title" style="color: ${color}"><i class="bi bi-cpu"></i> ${algoName}</h3>
+          <div class="result-content">
+            <div class="result-info mb-3">
+              <h4 class="mb-3"><i class="bi bi-diagram-3"></i> Preserved Edges: <span class="badge" style="background-color: ${color}; font-size: 1.2rem;">${preservedCount}</span></h4>
+              <div class="result-section">
+                <h5 class="mb-2"><i class="bi bi-bar-chart"></i> Statistics</h5>
+                <div class="stats-badges">${statsBadges}</div>
               </div>
             </div>
-            <div class="graph-panel">
-              <h4>Graph 2</h4>
-              <div class="graph-canvas-container">
-                <svg id="${id2}" class="graph-canvas" role="img" aria-label="${algoName} Graph 2"></svg>
+            <div class="result-graphs">
+              <div class="graph-panel card">
+                <div class="card-header"><h4 class="mb-0"><i class="bi bi-diagram-2"></i> Graph 1</h4></div>
+                <div class="card-body graph-canvas-container">
+                  <svg id="${id1}" class="graph-canvas" role="img" aria-label="${algoName} Graph 1"></svg>
+                </div>
+              </div>
+              <div class="graph-panel card">
+                <div class="card-header"><h4 class="mb-0"><i class="bi bi-diagram-2"></i> Graph 2</h4></div>
+                <div class="card-body graph-canvas-container">
+                  <svg id="${id2}" class="graph-canvas" role="img" aria-label="${algoName} Graph 2"></svg>
+                </div>
               </div>
             </div>
           </div>
