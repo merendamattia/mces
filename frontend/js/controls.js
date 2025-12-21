@@ -138,52 +138,44 @@ function renderAlgorithmResults(results) {
       const preservedCount = (result.preserved_edges || []).length;
       const stats = result.stats || {};
 
-      // Build stats badges
-      const statsBadges = Object.entries(stats)
+      // Build stats list
+      const statsList = Object.entries(stats)
         .map(([k, v]) => {
           let label = k.replace(/_/g, " ");
           let value = v;
 
           // Convert time_ms to seconds with 3 decimals
           if (k === "time_ms") {
-            label = "time";
+            label = "Time";
             value = (v / 1000).toFixed(3) + "s";
           } else if (typeof v === "number") {
             value = Number.isInteger(v) ? v : v.toFixed(2);
           }
 
-          const icon = k === 'time_ms' ? 'clock' : k.includes('explored') ? 'search' : k.includes('recursive') ? 'arrow-repeat' : k.includes('pruned') ? 'scissors' : 'check-circle';
-          return `<span class="badge bg-secondary me-2 mb-2"><i class="bi bi-${icon}"></i> ${label}: <strong>${value}</strong></span>`;
+          label = label.charAt(0).toUpperCase() + label.slice(1);
+
+          return `<div class="stat-item"><span class="stat-label">${label}:</span> <span class="stat-value">${value}</span></div>`;
         })
         .join("");
 
-      return `<div class="result-card card shadow-sm mb-4">
-        <div class="card-body">
-          <h3 class="card-title" style="color: ${color}"><i class="bi bi-cpu"></i> ${algoName}</h3>
-          <div class="result-content">
-            <div class="result-info mb-3">
-              <h4 class="mb-3"><i class="bi bi-diagram-3"></i> Preserved Edges: <span class="badge" style="background-color: ${color}; font-size: 1.2rem;">${preservedCount}</span></h4>
-              <div class="result-section">
-                <h5 class="mb-2"><i class="bi bi-bar-chart"></i> Statistics</h5>
-                <div class="stats-badges">${statsBadges}</div>
-              </div>
-            </div>
-            <div class="result-graphs">
-              <div class="graph-panel card">
-                <div class="card-header"><h4 class="mb-0"><i class="bi bi-diagram-2"></i> Graph 1</h4></div>
-                <div class="card-body graph-canvas-container">
-                  <svg id="${id1}" class="graph-canvas" role="img" aria-label="${algoName} Graph 1"></svg>
-                </div>
-              </div>
-              <div class="graph-panel card">
-                <div class="card-header"><h4 class="mb-0"><i class="bi bi-diagram-2"></i> Graph 2</h4></div>
-                <div class="card-body graph-canvas-container">
-                  <svg id="${id2}" class="graph-canvas" role="img" aria-label="${algoName} Graph 2"></svg>
-                </div>
-              </div>
+      return `<div class="result-card">
+          <div class="result-header">
+            <h3 style="color: ${color}">${algoName}</h3>
+            <div class="result-stats">
+              <div class="stat-item main"><span class="stat-label">Preserved Edges:</span> <span class="stat-value" style="color: ${color}">${preservedCount}</span></div>
+              ${statsList}
             </div>
           </div>
-        </div>
+          <div class="result-graphs">
+            <div class="graph-panel">
+              <h4>Graph 1</h4>
+              <svg id="${id1}" class="graph-canvas" role="img" aria-label="${algoName} Graph 1"></svg>
+            </div>
+            <div class="graph-panel">
+              <h4>Graph 2</h4>
+              <svg id="${id2}" class="graph-canvas" role="img" aria-label="${algoName} Graph 2"></svg>
+            </div>
+          </div>
       </div>`;
     })
     .join("");
