@@ -1,9 +1,26 @@
+/**
+ * Clears all child elements from an SVG element.
+ *
+ * @param {SVGElement} svgElement - The SVG element to clear
+ */
 function clearGraph(svgElement) {
   while (svgElement.firstChild) {
     svgElement.removeChild(svgElement.firstChild);
   }
 }
 
+/**
+ * Renders a graph in an SVG element with optional highlighted edges.
+ * Uses either cached positions or computes new layout using Fruchterman-Reingold algorithm.
+ * Highlighted edges and their connected nodes are drawn with specified colors.
+ *
+ * @param {string} svgId - The ID of the SVG element to render into
+ * @param {Object} graphData - Graph data containing nodes and edges arrays
+ * @param {string} colorClass - CSS class for edge coloring
+ * @param {Array} highlightEdges - Array of edges to highlight with optional color property
+ * @param {Map} cachedPositions - Optional cached node positions to maintain stable layout
+ * @returns {Map} Map of node IDs to {x, y} positions for caching
+ */
 function renderGraph(svgId, graphData, colorClass, highlightEdges = [], cachedPositions = null) {
   const svg = document.getElementById(svgId);
   if (!svg || !graphData) return null;
@@ -76,12 +93,32 @@ function renderGraph(svgId, graphData, colorClass, highlightEdges = [], cachedPo
   return positions;
 }
 
+/**
+ * Renders two graphs side by side with optional highlighting.
+ *
+ * @param {Object} graph1 - First graph data
+ * @param {Object} graph2 - Second graph data
+ * @param {Array} highlight1 - Edges to highlight in graph1
+ * @param {Array} highlight2 - Edges to highlight in graph2
+ * @returns {Object} Object containing positions1 and positions2 Maps
+ */
 function renderGraphs(graph1, graph2, highlight1 = [], highlight2 = []) {
   const positions1 = renderGraph("graph1", graph1, "graph1", highlight1);
   const positions2 = renderGraph("graph2", graph2, "graph2", highlight2);
   return { positions1, positions2 };
 }
 
+/**
+ * Computes graph layout using Fruchterman-Reingold force-directed algorithm.
+ * Nodes repel each other while edges act as springs pulling connected nodes together.
+ * Uses simulated annealing with decreasing temperature for stable convergence.
+ *
+ * @param {Array} nodes - Array of node objects with id property
+ * @param {Array} edges - Array of edge objects with source and target properties
+ * @param {number} width - Width of the layout area
+ * @param {number} height - Height of the layout area
+ * @returns {Map} Map of node IDs to {x, y} positions
+ */
 function computeFrLayout(nodes, edges, width, height) {
   // Fruchterman-Reingold style force layout (similar spirit to graphviz "sfdp" but lightweight).
   const positions = new Map();
