@@ -9,12 +9,11 @@ from core.graph import Graph
 
 
 def generate_random_graph(num_nodes: int, num_edges: int) -> Graph:
-    """Generate an undirected graph with up to num_edges edges.
+    """Generate a connected undirected graph with up to num_edges edges.
 
-    Guarantees every node has degree >= 1 when num_nodes > 1 by first creating
-    a minimal pairing, then sampling the remaining edges without replacement.
-    The requested edge count is clipped to respect graph constraints and the
-    degree guarantee.
+    Guarantees the graph is connected by first creating a spanning tree,
+    then adding additional edges randomly. For n nodes, the minimum number
+    of edges is (n-1) to ensure connectivity.
     """
 
     graph = Graph()
@@ -27,31 +26,36 @@ def generate_random_graph(num_nodes: int, num_edges: int) -> Graph:
 
     possible_edges = list(itertools.combinations(node_ids, 2))
     max_edges = len(possible_edges)
-    min_required = math.ceil(
-        num_nodes / 2
-    )  # minimal edges so each node has degree >= 1
+
+    # For a connected graph we need at least (n-1) edges
+    min_required = num_nodes - 1
     target_edges = max(min(num_edges, max_edges), min_required)
 
-    # Ensure each node has at least one edge via random pairing (wrap last if odd).
+    # Step 1: Create a spanning tree to ensure connectivity
+    # Shuffle nodes and connect them in sequence
     shuffled = node_ids[:]
     random.shuffle(shuffled)
-    initial_edges = []
-    for i in range(0, len(shuffled), 2):
-        u = shuffled[i]
-        v = shuffled[(i + 1) % len(shuffled)]
-        if u != v:
-            initial_edges.append(tuple(sorted((u, v))))
 
-    for source, target in initial_edges:
+    spanning_tree_edges = []
+    for i in range(len(shuffled) - 1):
+        u = shuffled[i]
+        v = shuffled[i + 1]
+        spanning_tree_edges.append(tuple(sorted((u, v))))
+
+    # Add spanning tree edges to graph
+    for source, target in spanning_tree_edges:
         graph.add_edge(source, target)
 
+    # Step 2: Add remaining edges randomly
     remaining_needed = target_edges - len(graph.edges)
     if remaining_needed > 0:
         existing = set(graph.edges)
         available_edges = [e for e in possible_edges if e not in existing]
-        sampled_edges = random.sample(available_edges, remaining_needed)
-        for source, target in sampled_edges:
-            graph.add_edge(source, target)
+        if len(available_edges) > 0:
+            sampled_count = min(remaining_needed, len(available_edges))
+            sampled_edges = random.sample(available_edges, sampled_count)
+            for source, target in sampled_edges:
+                graph.add_edge(source, target)
 
     return graph
 
