@@ -1,8 +1,10 @@
-const numNodesInput = document.getElementById("num-nodes");
-const numEdgesInput = document.getElementById("num-edges");
-const generateBtn = document.getElementById("generate-btn");
+const numNodesG1Input = document.getElementById("num-nodes-g1");
+const numEdgesG1Input = document.getElementById("num-edges-g1");
+const generateG1Btn = document.getElementById("generate-g1-btn");
+const numNodesG2Input = document.getElementById("num-nodes-g2");
+const numEdgesG2Input = document.getElementById("num-edges-g2");
+const generateG2Btn = document.getElementById("generate-g2-btn");
 const runMcesBtn = document.getElementById("run-mces-btn");
-const statusEl = document.getElementById("status");
 const algoResults = document.getElementById("algo-results");
 const algBruteforce = document.getElementById("alg-bruteforce");
 const algArcmatch = document.getElementById("alg-bruteforce-arcmatch");
@@ -14,45 +16,56 @@ let lastGraph2 = null;
 let cachedPositions1 = null;
 let cachedPositions2 = null;
 
-function setStatus(message, isError = false) {
-  statusEl.textContent = message;
-  statusEl.style.color = isError ? "#b91c1c" : "#52606d";
-}
-
-async function handleGenerate() {
-  const numNodes = parseInt(numNodesInput.value, 10);
-  const numEdges = parseInt(numEdgesInput.value, 10);
+async function handleGenerateGraph1() {
+  const numNodes = parseInt(numNodesG1Input.value, 10);
+  const numEdges = parseInt(numEdgesG1Input.value, 10);
 
   if (Number.isNaN(numNodes) || Number.isNaN(numEdges)) {
-    setStatus("Please enter valid numbers.", true);
+    alert("Please enter valid numbers for Graph 1");
     return;
   }
 
-  setStatus("Generating graphs...");
-  generateBtn.disabled = true;
-  runMcesBtn.disabled = true;
-
+  generateG1Btn.disabled = true;
   try {
     const result = await requestGraphs(numNodes, numEdges);
     lastGraph1 = result.graph1;
-    lastGraph2 = result.graph2;
-    // Reset cached positions when new graphs are generated
     cachedPositions1 = null;
-    cachedPositions2 = null;
-    const positions = renderGraphs(lastGraph1, lastGraph2);
-    cachedPositions1 = positions.positions1;
-    cachedPositions2 = positions.positions2;
+    const positions1 = renderGraph("graph1", lastGraph1, "graph1", []);
+    cachedPositions1 = positions1;
     renderAlgorithmResults([]);
-    setStatus("Graphs updated.");
   } catch (err) {
-    setStatus(err.message || "Request failed", true);
+    alert(err.message || "Failed to generate Graph 1");
   } finally {
-    generateBtn.disabled = false;
-    runMcesBtn.disabled = false;
+    generateG1Btn.disabled = false;
   }
 }
 
-generateBtn.addEventListener("click", handleGenerate);
+async function handleGenerateGraph2() {
+  const numNodes = parseInt(numNodesG2Input.value, 10);
+  const numEdges = parseInt(numEdgesG2Input.value, 10);
+
+  if (Number.isNaN(numNodes) || Number.isNaN(numEdges)) {
+    alert("Please enter valid numbers for Graph 2");
+    return;
+  }
+
+  generateG2Btn.disabled = true;
+  try {
+    const result = await requestGraphs(numNodes, numEdges);
+    lastGraph2 = result.graph1; // Use graph1 from result since we're calling with different params
+    cachedPositions2 = null;
+    const positions2 = renderGraph("graph2", lastGraph2, "graph2", []);
+    cachedPositions2 = positions2;
+    renderAlgorithmResults([]);
+  } catch (err) {
+    alert(err.message || "Failed to generate Graph 2");
+  } finally {
+    generateG2Btn.disabled = false;
+  }
+}
+
+generateG1Btn.addEventListener("click", handleGenerateGraph1);
+generateG2Btn.addEventListener("click", handleGenerateGraph2);
 runMcesBtn.addEventListener("click", handleRunMces);
 
 // Select all algorithms handler
@@ -71,11 +84,11 @@ algoCheckboxes.forEach(cb => {
 });
 
 // Initial render to show default parameters quickly.
-handleGenerate();
+handleGenerateGraph1().then(() => handleGenerateGraph2());
 
 async function handleRunMces() {
   if (!lastGraph1 || !lastGraph2) {
-    setStatus("Generate graphs before running MCES.", true);
+    alert("Generate both graphs before running MCES.");
     return;
   }
 
@@ -84,13 +97,11 @@ async function handleRunMces() {
   if (algArcmatch.checked) selected.push("bruteforce_arcmatch");
 
   if (selected.length === 0) {
-    setStatus("Select at least one algorithm.", true);
+    alert("Select at least one algorithm.");
     return;
   }
 
-  setStatus("Running MCES...");
   runMcesBtn.disabled = true;
-  generateBtn.disabled = true;
 
   try {
     const promises = selected.map((alg) => {
@@ -100,14 +111,11 @@ async function handleRunMces() {
 
     const results = await Promise.all(promises);
 
-    renderGraphs(lastGraph1, lastGraph2);
     renderAlgorithmResults(results);
-    setStatus("MCES completed.");
   } catch (err) {
-    setStatus(err.message || "MCES request failed", true);
+    alert(err.message || "MCES request failed");
   } finally {
     runMcesBtn.disabled = false;
-    generateBtn.disabled = false;
   }
 }
 

@@ -13,16 +13,34 @@
       <p class="subtitle">Generate two random graphs, visualize them, and prepare for MCES experimentation.</p>
     </header>
 
-    <section id="controls">
-    <label for="num-nodes">Number of nodes</label>
-    <input id="num-nodes" type="number" min="1" value="8" />
-
-    <label for="num-edges">Number of edges</label>
-    <input id="num-edges" type="number" min="0" value="10" />
-
-    <button id="generate-btn">Generate Graphs</button>
-    <span id="status" aria-live="polite"></span>
-  </section>
+  <main id="visualization">
+    <div class="graph-panel">
+      <div class="graph-header">
+        <h2>Graph 1</h2>
+        <div class="graph-controls">
+          <label for="num-nodes-g1">Nodes</label>
+          <input id="num-nodes-g1" type="number" min="1" value="8" class="form-control form-control-sm" />
+          <label for="num-edges-g1">Edges</label>
+          <input id="num-edges-g1" type="number" min="0" value="10" class="form-control form-control-sm" />
+          <button id="generate-g1-btn" class="btn btn-primary btn-sm"><i class="bi bi-arrow-clockwise"></i> Generate</button>
+        </div>
+      </div>
+      <svg id="graph1" class="graph-canvas" role="img" aria-label="Graph 1"></svg>
+    </div>
+    <div class="graph-panel">
+      <div class="graph-header">
+        <h2>Graph 2</h2>
+        <div class="graph-controls">
+          <label for="num-nodes-g2">Nodes</label>
+          <input id="num-nodes-g2" type="number" min="1" value="8" class="form-control form-control-sm" />
+          <label for="num-edges-g2">Edges</label>
+          <input id="num-edges-g2" type="number" min="0" value="10" class="form-control form-control-sm" />
+          <button id="generate-g2-btn" class="btn btn-primary btn-sm"><i class="bi bi-arrow-clockwise"></i> Generate</button>
+        </div>
+      </div>
+      <svg id="graph2" class="graph-canvas" role="img" aria-label="Graph 2"></svg>
+    </div>
+  </main>
 
   <section id="algorithms">
     <h2>Algorithms</h2>
@@ -38,17 +56,6 @@
       <button id="run-mces-btn">Run MCES</button>
     </div>
   </section>
-
-  <main id="visualization">
-    <div class="graph-panel">
-      <h2>Graph 1</h2>
-      <svg id="graph1" class="graph-canvas" role="img" aria-label="Graph 1"></svg>
-    </div>
-    <div class="graph-panel">
-      <h2>Graph 2</h2>
-      <svg id="graph2" class="graph-canvas" role="img" aria-label="Graph 2"></svg>
-    </div>
-  </main>
 
   <section id="algo-results" class="results-panel">
     <!-- Per-algorithm rendered graphs will appear here -->

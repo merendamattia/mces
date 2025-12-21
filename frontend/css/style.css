@@ -151,10 +151,53 @@ h1 {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.graph-panel h2 {
-  margin: 0 0 0.75rem;
+.graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.graph-header h2 {
+  margin: 0;
   font-size: 1.2rem;
   color: #1f2937;
+}
+
+.graph-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.graph-controls label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.graph-controls input {
+  width: 65px;
+}
+
+.graph-controls button {
+  white-space: nowrap;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  font-weight: 600;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.graph-controls button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .graph-canvas {
