@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MCES Visualizer Prototype</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Maximum Common Edge-Subgraph (MCES) Prototype</h1>
+    <p class="subtitle">Generate two random graphs, visualize them, and prepare for MCES experimentation.</p>
+  </header>
+
+  <section id="controls">
+    <label for="num-nodes">Number of nodes</label>
+    <input id="num-nodes" type="number" min="1" value="8" />
+
+    <label for="num-edges">Number of edges</label>
+    <input id="num-edges" type="number" min="0" value="10" />
+
+    <button id="generate-btn">Generate Graphs</button>
+    <span id="status" aria-live="polite"></span>
+  </section>
+
+  <main id="visualization">
+    <div class="graph-panel">
+      <h2>Graph 1</h2>
+      <svg id="graph1" class="graph-canvas" role="img" aria-label="Graph 1"></svg>
+    </div>
+    <div class="graph-panel">
+      <h2>Graph 2</h2>
+      <svg id="graph2" class="graph-canvas" role="img" aria-label="Graph 2"></svg>
+    </div>
+  </main>
+
+  <footer>
+    <p>This is an academic prototype. Future work: plug in MCES algorithms and profiling.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/graph_view.js"></script>
+  <script src="js/controls.js"></script>
+</body>
+</html>
