@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import itertools
-import math
 import random
 from typing import Tuple
 

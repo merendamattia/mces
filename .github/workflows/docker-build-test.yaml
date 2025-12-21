@@ -31,7 +31,7 @@ jobs:
           sleep 10
           curl --fail http://localhost:5001/api/generate -X POST \
             -H "Content-Type: application/json" \
-            -d '{"num_nodes": 3, "num_edges": 2, "algorithm": "none"}' || exit 1
+            -d '{"num_nodes": 3, "num_edges": 2}' || exit 1
           docker stop mces-backend-test
           docker rm mces-backend-test
           echo "Backend container tested successfully"
@@ -43,7 +43,7 @@ jobs:
           curl --fail http://localhost:8000/ || exit 1
           curl --fail http://localhost:5001/api/generate -X POST \
             -H "Content-Type: application/json" \
-            -d '{"num_nodes": 3, "num_edges": 2, "algorithm": "none"}' || exit 1
+            -d '{"num_nodes": 3, "num_edges": 2}' || exit 1
           docker compose down
           echo "Docker Compose tested successfully"
 

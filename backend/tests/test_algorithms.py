@@ -3,8 +3,6 @@ Unit tests for MCES algorithms (brute force and ArcMatch).
 Tests validate correctness of MCES computation, edge preservation,
 and performance characteristics.
 """
-
-import pytest
 from algorithms.brute_force import compute_mces as brute_force_mces
 from algorithms.brute_force_arcmatch import compute_mces as arcmatch_mces
 from core.graph import Graph

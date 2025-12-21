@@ -3,7 +3,6 @@ Unit tests for Graph class.
 Tests basic graph operations including node/edge addition and validation.
 """
 
-import pytest
 from core.graph import Graph
 
 

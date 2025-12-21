@@ -41,6 +41,7 @@ async function handleGenerateGraph1() {
     algoResults.innerHTML = ""; // Clear previous results
   } catch (err) {
     alert(err.message || "Failed to generate Graph 1");
+    console.error(err);
   } finally {
     generateG1Btn.disabled = false;
   }
@@ -69,6 +70,7 @@ async function handleGenerateGraph2() {
     algoResults.innerHTML = ""; // Clear previous results
   } catch (err) {
     alert(err.message || "Failed to generate Graph 2");
+    console.error(err);
   } finally {
     generateG2Btn.disabled = false;
   }
@@ -130,6 +132,8 @@ async function handleRunMces() {
         renderAlgorithmResult(result);
       }).catch(err => {
         console.error(`Error in ${alg}:`, err);
+        // Re-throw so that Promise.all can detect the failure and the user is notified.
+        throw err;
       });
 
       return promise;
@@ -139,6 +143,7 @@ async function handleRunMces() {
     await Promise.all(promises);
   } catch (err) {
     alert(err.message || "MCES request failed");
+    console.error(err);
   } finally {
     runMcesBtn.disabled = false;
   }

@@ -4,7 +4,6 @@ Tests ensure graphs are connected, have correct number of nodes/edges,
 and adhere to structural constraints.
 """
 
-import pytest
 from core.generator import generate_random_graph, generate_random_graph_pair
 from core.graph import Graph
 
