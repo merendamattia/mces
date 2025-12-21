@@ -1,0 +1,54 @@
+name: 'Check Docker Image building'
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  docker-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Backend Docker image
+        run: |
+          docker build --no-cache -t mces-backend:ci -f Dockerfile .
+          echo "Backend image built successfully"
+
+      - name: Build Frontend Docker image
+        run: |
+          docker build --no-cache -t mces-frontend:ci -f Dockerfile.frontend .
+          echo "Frontend image built successfully"
+
+      - name: Test Backend image
+        run: |
+          docker run -d --name mces-backend-test -p 5001:5001 mces-backend:ci
+          sleep 10
+          curl --fail http://localhost:5001/api/generate -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"num_nodes": 3, "num_edges": 2, "algorithm": "none"}' || exit 1
+          docker stop mces-backend-test
+          docker rm mces-backend-test
+          echo "Backend container tested successfully"
+
+      - name: Test Docker Compose
+        run: |
+          docker-compose up -d
+          sleep 15
+          curl --fail http://localhost:8000/ || exit 1
+          curl --fail http://localhost:5001/api/generate -X POST \
+            -H "Content-Type: application/json" \
+            -d '{"num_nodes": 3, "num_edges": 2, "algorithm": "none"}' || exit 1
+          docker-compose down
+          echo "Docker Compose tested successfully"
+
+      - name: Clean up Docker images
+        if: always()
+        run: |
+          docker rmi mces-backend:ci mces-frontend:ci || true
+          docker system prune -f

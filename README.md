@@ -67,6 +67,22 @@ Then open `http://localhost:8000` in your browser. The backend enables permissiv
 
 If you select an MCES algorithm in the UI, the backend also returns the MCES mapping, preserved edges, and stats for small graphs.
 
+## Docker deployment
+
+The easiest way to run the entire application is using Docker Compose:
+
+```bash
+# Build and start both backend and frontend
+docker-compose up
+
+# Stop the application
+docker-compose down
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:8000
+- **Backend API**: http://localhost:5001
+
 ## MCES baselines
 
 - `backend/algorithms/brute_force.py`: full permutation search, returns best mapping and preserved edges with basic stats.
