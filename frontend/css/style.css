@@ -216,16 +216,18 @@ h1 {
 }
 
 .edge {
-  stroke: #cbd5e1; /* base gray */
   stroke-width: 3;
   stroke-linecap: round;
   opacity: 0.35;
 }
 
+.edge:not(.highlight) {
+  stroke: #cbd5e1; /* base gray */
+}
+
 .edge.highlight {
   stroke-width: 5.5;
   opacity: 1;
-  filter: drop-shadow(0 4px 6px rgba(37, 99, 235, 0.2));
 }
 
 .node.dim {
@@ -234,8 +236,6 @@ h1 {
 }
 
 .node.highlight {
-  fill: #3b5bfd;
-  stroke: #1d4ed8;
   filter: drop-shadow(0 3px 6px rgba(59, 91, 253, 0.35));
 }
 

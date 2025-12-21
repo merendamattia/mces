@@ -43,10 +43,10 @@ function renderGraph(svgId, graphData, colorClass, highlightEdges = [], cachedPo
     line.setAttribute("x2", target.x);
     line.setAttribute("y2", target.y);
     line.setAttribute("class", "edge highlight");
-    line.setAttribute("stroke", "#3b5bfd");
+    const color = edge.color || "#3b5bfd";
+    line.setAttribute("stroke", color);
     svg.appendChild(line);
 
-    const color = "#3b5bfd";
     if (!highlightNodes.has(edge.source)) highlightNodes.set(edge.source, color);
     if (!highlightNodes.has(edge.target)) highlightNodes.set(edge.target, color);
   });
@@ -63,8 +63,8 @@ function renderGraph(svgId, graphData, colorClass, highlightEdges = [], cachedPo
     if (highlightNodes.has(node.id)) {
       circle.setAttribute("class", "node highlight");
       if (color) {
-        circle.setAttribute("fill", color);
-        circle.setAttribute("stroke", color);
+        circle.style.fill = color;
+        circle.style.stroke = color;
       }
     } else {
       circle.setAttribute("class", "node dim");
