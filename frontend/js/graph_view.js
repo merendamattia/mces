@@ -4,9 +4,9 @@ function clearGraph(svgElement) {
   }
 }
 
-function renderGraph(svgId, graphData, colorClass) {
+function renderGraph(svgId, graphData, colorClass, highlightEdges = [], cachedPositions = null) {
   const svg = document.getElementById(svgId);
-  if (!svg || !graphData) return;
+  if (!svg || !graphData) return null;
 
   clearGraph(svg);
   const width = svg.clientWidth;
@@ -15,7 +15,7 @@ function renderGraph(svgId, graphData, colorClass) {
   const nodes = graphData.nodes || [];
   const edges = graphData.edges || [];
 
-  const positions = computeFrLayout(nodes, edges, width, height);
+  const positions = cachedPositions || computeFrLayout(nodes, edges, width, height);
 
   edges.forEach((edge) => {
     const source = positions.get(edge.source);
@@ -31,6 +31,26 @@ function renderGraph(svgId, graphData, colorClass) {
     svg.appendChild(line);
   });
 
+  // Highlighted edges overlaid for algorithm results.
+  const highlightNodes = new Map(); // nodeId -> color
+  highlightEdges.forEach((edge) => {
+    const source = positions.get(edge.source);
+    const target = positions.get(edge.target);
+    if (!source || !target) return;
+    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("x1", source.x);
+    line.setAttribute("y1", source.y);
+    line.setAttribute("x2", target.x);
+    line.setAttribute("y2", target.y);
+    line.setAttribute("class", "edge highlight");
+    line.setAttribute("stroke", "#3b5bfd");
+    svg.appendChild(line);
+
+    const color = "#3b5bfd";
+    if (!highlightNodes.has(edge.source)) highlightNodes.set(edge.source, color);
+    if (!highlightNodes.has(edge.target)) highlightNodes.set(edge.target, color);
+  });
+
   nodes.forEach((node) => {
     const pos = positions.get(node.id);
     if (!pos) return;
@@ -39,23 +59,27 @@ function renderGraph(svgId, graphData, colorClass) {
     circle.setAttribute("cx", pos.x);
     circle.setAttribute("cy", pos.y);
     circle.setAttribute("r", 12);
-    circle.setAttribute("class", `node ${colorClass}`);
-
-    const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-    label.setAttribute("x", pos.x);
-    label.setAttribute("y", pos.y + 4);
-    label.setAttribute("text-anchor", "middle");
-    label.setAttribute("font-size", "10px");
-    label.textContent = node.id;
+    const color = highlightNodes.get(node.id);
+    if (highlightNodes.has(node.id)) {
+      circle.setAttribute("class", "node highlight");
+      if (color) {
+        circle.setAttribute("fill", color);
+        circle.setAttribute("stroke", color);
+      }
+    } else {
+      circle.setAttribute("class", "node dim");
+    }
 
     svg.appendChild(circle);
-    svg.appendChild(label);
   });
+
+  return positions;
 }
 
-function renderGraphs(graph1, graph2) {
-  renderGraph("graph1", graph1, "graph1");
-  renderGraph("graph2", graph2, "graph2");
+function renderGraphs(graph1, graph2, highlight1 = [], highlight2 = []) {
+  const positions1 = renderGraph("graph1", graph1, "graph1", highlight1);
+  const positions2 = renderGraph("graph2", graph2, "graph2", highlight2);
+  return { positions1, positions2 };
 }
 
 function computeFrLayout(nodes, edges, width, height) {

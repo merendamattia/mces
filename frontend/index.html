@@ -23,6 +23,17 @@
     <span id="status" aria-live="polite"></span>
   </section>
 
+  <section id="algorithms">
+    <h2>Algorithms</h2>
+    <div class="algo-controls">
+      <div class="algo-checkboxes">
+        <label><input type="checkbox" id="alg-bruteforce" value="bruteforce" /> Naïve brute-force</label>
+        <label><input type="checkbox" id="alg-bruteforce-arcmatch" value="bruteforce_arcmatch" /> Brute-force + ArcMatch</label>
+      </div>
+      <button id="run-mces-btn">Run MCES</button>
+    </div>
+  </section>
+
   <main id="visualization">
     <div class="graph-panel">
       <h2>Graph 1</h2>
@@ -34,8 +45,12 @@
     </div>
   </main>
 
+  <section id="algo-results" class="results-panel">
+    <!-- Per-algorithm rendered graphs will appear here -->
+  </section>
+
   <footer>
-    <p>This is an academic prototype. Future work: plug in MCES algorithms and profiling.</p>
+    <p>This is an academic prototype.</p>
   </footer>
 
   <script src="js/api.js"></script>

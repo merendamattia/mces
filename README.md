@@ -30,13 +30,21 @@ The API will listen on `http://localhost:5001` by default (set `PORT` to overrid
 - **POST /api/generate**
 - Request JSON:
   ```json
-  { "num_nodes": <int>, "num_edges": <int> }
+  { "num_nodes": <int>, "num_edges": <int>, "algorithm": "none" | "bruteforce" | "bruteforce_arcmatch" }
   ```
 - Response JSON:
   ```json
   {
     "graph1": { "nodes": [{"id": "1"}], "edges": [{"source": "1", "target": "2"}] },
-    "graph2": { "nodes": [...], "edges": [...] }
+    "graph2": { "nodes": [...], "edges": [...] },
+    "mces": {
+      "algorithm": "bruteforce",
+      "result": {
+        "mapping": {"1": "2"},
+        "preserved_edges": [["1", "2"]],
+        "stats": {"time_ms": 1.2, "mappings_explored": 2}
+      }
+    }
   }
   ```
 
@@ -56,3 +64,12 @@ Then open `http://localhost:8000` in your browser. The backend enables permissiv
 - let you set node and edge counts,
 - call the backend to generate two independent random graphs,
 - render both graphs side by side using SVG with a Fruchterman–Reingold-style force layout.
+
+If you select an MCES algorithm in the UI, the backend also returns the MCES mapping, preserved edges, and stats for small graphs.
+
+## MCES baselines
+
+- `backend/algorithms/brute_force.py`: full permutation search, returns best mapping and preserved edges with basic stats.
+- `backend/algorithms/brute_force_arcmatch.py`: recursive backtracking with ArcMatch-style consistency checks (endpoint consistency, partial mapping feasibility, injectivity) and pruning stats.
+
+Both are intended for small graphs (<= 8–10 nodes) and share the same output schema: mapping, preserved_edges, stats.
