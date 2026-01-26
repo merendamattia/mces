@@ -68,3 +68,29 @@ async function requestMcesBruteforceArcmatch(graph1, graph2) {
   }
   return response.json();
 }
+
+async function requestMcesConnected(graph1, graph2) {
+  const response = await fetch(`${API_BASE}/api/mces/connected`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ graph1, graph2 })
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Request failed" }));
+    throw new Error(error.error || "Request failed");
+  }
+  return response.json();
+}
+
+async function requestMcesGreedyPath(graph1, graph2, maxPathLen = 4) {
+  const response = await fetch(`${API_BASE}/api/mces/greedy_path`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ graph1, graph2, max_path_len: maxPathLen })
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Request failed" }));
+    throw new Error(error.error || "Request failed");
+  }
+  return response.json();
+}

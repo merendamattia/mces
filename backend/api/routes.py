@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from algorithms import compute_mces_bruteforce, compute_mces_bruteforce_arcmatch
+from algorithms import (
+    compute_mces_bruteforce,
+    compute_mces_bruteforce_arcmatch,
+    compute_mces_connected,
+    compute_mces_greedy_path,
+)
 from core.generator import generate_random_graph_pair
 from core.graph import Graph
 from flask import Blueprint, jsonify, request
@@ -72,3 +77,29 @@ def run_bruteforce_arcmatch():
         return err_resp, status
     result = compute_mces_bruteforce_arcmatch(g1, g2)
     return jsonify({"algorithm": "bruteforce_arcmatch", "result": result})
+
+
+@api_bp.route("/mces/connected", methods=["POST"])
+def run_connected_mces():
+    payload = request.get_json(silent=True) or {}
+    g1, g2, err_resp, status = _parse_graphs_payload(payload)
+    if err_resp:
+        return err_resp, status
+    result = compute_mces_connected(g1, g2)
+    return jsonify({"algorithm": "connected_mces", "result": result})
+
+
+@api_bp.route("/mces/greedy_path", methods=["POST"])
+def run_greedy_path_mces():
+    payload = request.get_json(silent=True) or {}
+    g1, g2, err_resp, status = _parse_graphs_payload(payload)
+    if err_resp:
+        return err_resp, status
+    # allow optional path length parameter
+    max_len = None
+    try:
+        max_len = int((payload or {}).get("max_path_len", 4))
+    except (TypeError, ValueError):
+        max_len = 4
+    result = compute_mces_greedy_path(g1, g2)
+    return jsonify({"algorithm": "greedy_path_mces", "result": result})

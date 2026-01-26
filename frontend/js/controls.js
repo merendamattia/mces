@@ -9,6 +9,8 @@ const runMcesBtn = document.getElementById("run-mces-btn");
 const algoResults = document.getElementById("algo-results");
 const algBruteforce = document.getElementById("alg-bruteforce");
 const algArcmatch = document.getElementById("alg-bruteforce-arcmatch");
+const algConnected = document.getElementById("alg-connected");
+const algGreedyPath = document.getElementById("alg-greedy-path");
 const selectAllAlgorithms = document.getElementById("select-all-algorithms");
 const algoCheckboxes = document.querySelectorAll(".algo-checkbox");
 
@@ -112,6 +114,8 @@ async function handleRunMces() {
   const selected = [];
   if (algBruteforce.checked) selected.push("bruteforce");
   if (algArcmatch.checked) selected.push("bruteforce_arcmatch");
+  if (algConnected && algConnected.checked) selected.push("connected_mces");
+  if (algGreedyPath && algGreedyPath.checked) selected.push("greedy_path_mces");
 
   if (selected.length === 0) {
     alert("Select at least one algorithm.");
@@ -159,8 +163,8 @@ async function handleRunMces() {
  * @param {Object} entry.result - Result data including preserved_edges, mapping, and stats
  */
 function renderAlgorithmResult(entry) {
-  const colors = { bruteforce: "#0ea5e9", bruteforce_arcmatch: "#f97316" };
-  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_arcmatch: "Brute-Force + ArcMatch" };
+  const colors = { bruteforce: "#0ea5e9", bruteforce_arcmatch: "#f97316", connected_mces: "#10b981", greedy_path_mces: "#8b5cf6" };
+  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_arcmatch: "Brute-Force + ArcMatch", connected_mces: "Connected MCES", greedy_path_mces: "Greedy Path MCES" };
 
   const { algorithm, result } = entry;
   const idx = algoResults.children.length; // Use current number of children as index

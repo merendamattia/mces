@@ -177,6 +177,3 @@ def _result(
             "valid_edge_checks": stats.valid_edge_checks,
         },
     }
-
-
-# Extension point: additional pruning heuristics (e.g., degree ordering) can be layered here.
