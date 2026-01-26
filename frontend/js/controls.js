@@ -127,9 +127,18 @@ async function handleRunMces() {
 
   try {
     const promises = selected.map((alg) => {
-      const promise = alg === "bruteforce"
-        ? requestMcesBruteforce(lastGraph1, lastGraph2)
-        : requestMcesBruteforceArcmatch(lastGraph1, lastGraph2);
+      let promise;
+      if (alg === "bruteforce") {
+        promise = requestMcesBruteforce(lastGraph1, lastGraph2);
+      } else if (alg === "bruteforce_arcmatch") {
+        promise = requestMcesBruteforceArcmatch(lastGraph1, lastGraph2);
+      } else if (alg === "connected_mces") {
+        promise = requestMcesConnected(lastGraph1, lastGraph2);
+      } else if (alg === "greedy_path_mces") {
+        promise = requestMcesGreedyPath(lastGraph1, lastGraph2);
+      } else {
+        promise = Promise.reject(new Error("Unknown algorithm: " + alg));
+      }
 
       // Render each result as soon as it arrives
       promise.then(result => {
