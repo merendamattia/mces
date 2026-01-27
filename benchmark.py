@@ -47,7 +47,7 @@ OUTPUT_CSV = "benchmark_results.csv"
 # Top-level results folder
 RESULTS_ROOT = "results"
 # Thread pool max workers for concurrent runs
-MAX_WORKERS = 6
+MAX_WORKERS = 3
 # Random seed for reproducibility (None for random)
 RANDOM_SEED = 42
 # -----------------------------------------------------------------
