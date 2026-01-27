@@ -140,6 +140,8 @@ def main():
         with print_lock:
             print(*args, **kwargs)
 
+    safe_print(f"Per-call timeout: {PER_CALL_TIMEOUT}s (timeouts will be recorded)")
+
     run_idx = 0
 
     # Prepare results directory and CSV file with header before running
@@ -211,6 +213,7 @@ def main():
             json.dump(meta, mf, indent=2)
     except Exception:
         pass
+
     # Use a ThreadPoolExecutor to submit algorithm runs concurrently (each run still
     # spawns a process internally to enforce timeouts). This avoids blocking the
     # main loop when a single algorithm is slow.
@@ -218,10 +221,6 @@ def main():
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
     def run_and_record(alg_name, alg_fn, g1, g2, n, m, rep, idx, total):
-        safe_print(
-            f"[{idx}/{total}] n={n} m={m} rep={rep} -> {alg_name} (timeout {PER_CALL_TIMEOUT}s)",
-            end=" ",
-        )
         started = time.time()
         finished, result = call_with_timeout(alg_fn, g1, g2, PER_CALL_TIMEOUT)
         elapsed = time.time() - started
@@ -234,13 +233,15 @@ def main():
         }
 
         if not finished:
-            safe_print("[TIMEOUT]")
+            status = "TIMEOUT"
             row = dict(base)
             row.update({"timeout": True})
             append_row(row)
+            safe_print(
+                f"[{idx}/{total}] n={n} m={m} rep={rep} -> {alg_name} [{status}]"
+            )
             return
 
-        safe_print("[OK]")
         preserved = result.get("preserved_edges") if isinstance(result, dict) else None
         preserved_count = len(preserved) if preserved else 0
         stats = (result.get("stats") if isinstance(result, dict) else {}) or {}
@@ -250,6 +251,8 @@ def main():
         for k, v in stats.items():
             row[k] = v
         append_row(row)
+        status = "OK"
+        safe_print(f"[{idx}/{total}] n={n} m={m} rep={rep} -> {alg_name} [{status}]")
 
     # Submit all runs to the threadpool
     for n in range(N_MIN, N_MAX + 1):
