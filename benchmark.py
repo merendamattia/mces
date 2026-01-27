@@ -15,6 +15,7 @@ import multiprocessing as mp
 import os
 import pathlib
 import sys
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Tuple
@@ -132,6 +133,13 @@ def main():
         f"Benchmark plan: nodes {N_MIN}-{N_MAX}, repeats={REPEATS}, total runs ~ {total_runs}"
     )
 
+    # thread-safe printing helper
+    print_lock = threading.Lock()
+
+    def safe_print(*args, **kwargs):
+        with print_lock:
+            print(*args, **kwargs)
+
     run_idx = 0
 
     # Prepare results directory and CSV file with header before running
@@ -174,7 +182,6 @@ def main():
         # ensure consistent order and presence of keys
         out = {k: row.get(k, "") for k in header}
         with open(out_path, "a", newline="") as fh:
-            # exclusive lock
             try:
                 fcntl.flock(fh.fileno(), fcntl.LOCK_EX)
                 writer = csv.DictWriter(fh, fieldnames=header)
@@ -211,7 +218,7 @@ def main():
     executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
     def run_and_record(alg_name, alg_fn, g1, g2, n, m, rep, idx, total):
-        print(
+        safe_print(
             f"[{idx}/{total}] n={n} m={m} rep={rep} -> {alg_name} (timeout {PER_CALL_TIMEOUT}s)",
             end=" ",
         )
@@ -227,13 +234,13 @@ def main():
         }
 
         if not finished:
-            print("[TIMEOUT]")
+            safe_print("[TIMEOUT]")
             row = dict(base)
             row.update({"timeout": True})
             append_row(row)
             return
 
-        print("[OK]")
+        safe_print("[OK]")
         preserved = result.get("preserved_edges") if isinstance(result, dict) else None
         preserved_count = len(preserved) if preserved else 0
         stats = (result.get("stats") if isinstance(result, dict) else {}) or {}
@@ -249,10 +256,10 @@ def main():
         edge_counts = expand_edge_counts(n)
         for m in edge_counts:
             for rep in range(1, REPEATS + 1):
-                run_idx += 1
                 g1, g2 = generate_random_graph_pair(num_nodes=n, num_edges=m)
                 for alg_name, alg_fn in algorithms:
-                    # capture current values in submission
+                    # increment run index per algorithm submission so counters are accurate
+                    run_idx += 1
                     futures.append(
                         executor.submit(
                             run_and_record,
@@ -273,10 +280,10 @@ def main():
         try:
             fut.result()
         except Exception as e:
-            print("Task failed:", e)
+            safe_print("Task failed:", e)
 
     executor.shutdown()
-    print(f"Benchmark finished. Results written to {out_path}")
+    safe_print(f"Benchmark finished. Results written to {out_path}")
 
 
 if __name__ == "__main__":
