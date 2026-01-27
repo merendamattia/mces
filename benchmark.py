@@ -16,6 +16,7 @@ import os
 import pathlib
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Tuple
 
 repo_root = pathlib.Path(__file__).resolve().parent
@@ -45,6 +46,8 @@ PER_CALL_TIMEOUT = 300
 OUTPUT_CSV = "benchmark_results.csv"
 # Top-level results folder
 RESULTS_ROOT = "results"
+# Thread pool max workers for concurrent runs
+MAX_WORKERS = 6
 # Random seed for reproducibility (None for random)
 RANDOM_SEED = 42
 # -----------------------------------------------------------------
@@ -201,113 +204,78 @@ def main():
             json.dump(meta, mf, indent=2)
     except Exception:
         pass
+    # Use a ThreadPoolExecutor to submit algorithm runs concurrently (each run still
+    # spawns a process internally to enforce timeouts). This avoids blocking the
+    # main loop when a single algorithm is slow.
+    futures = []
+    executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
+
+    def run_and_record(alg_name, alg_fn, g1, g2, n, m, rep, idx, total):
+        print(
+            f"[{idx}/{total}] n={n} m={m} rep={rep} -> {alg_name} (timeout {PER_CALL_TIMEOUT}s)",
+            end=" ",
+        )
+        started = time.time()
+        finished, result = call_with_timeout(alg_fn, g1, g2, PER_CALL_TIMEOUT)
+        elapsed = time.time() - started
+        base = {
+            "algorithm": alg_name,
+            "num_nodes": n,
+            "num_edges": m,
+            "repeat": rep,
+            "run_time_sec_wall": round(elapsed, 3),
+        }
+
+        if not finished:
+            print("[TIMEOUT]")
+            row = dict(base)
+            row.update({"timeout": True})
+            append_row(row)
+            return
+
+        print("[OK]")
+        preserved = result.get("preserved_edges") if isinstance(result, dict) else None
+        preserved_count = len(preserved) if preserved else 0
+        stats = (result.get("stats") if isinstance(result, dict) else {}) or {}
+
+        row = dict(base)
+        row.update({"timeout": False, "preserved_edges_count": preserved_count})
+        for k, v in stats.items():
+            row[k] = v
+        append_row(row)
+
+    # Submit all runs to the threadpool
     for n in range(N_MIN, N_MAX + 1):
         edge_counts = expand_edge_counts(n)
         for m in edge_counts:
             for rep in range(1, REPEATS + 1):
                 run_idx += 1
-                print(f"[{run_idx}/{total_runs}] n={n} m={m} rep={rep}")
-                # generate graphs
                 g1, g2 = generate_random_graph_pair(num_nodes=n, num_edges=m)
-
                 for alg_name, alg_fn in algorithms:
-                    print(
-                        f" -> Running {alg_name} (timeout {PER_CALL_TIMEOUT}s)", end=" "
+                    # capture current values in submission
+                    futures.append(
+                        executor.submit(
+                            run_and_record,
+                            alg_name,
+                            alg_fn,
+                            g1,
+                            g2,
+                            n,
+                            m,
+                            rep,
+                            run_idx,
+                            total_runs,
+                        )
                     )
-                    started = time.time()
-                    finished, result = call_with_timeout(
-                        alg_fn, g1, g2, PER_CALL_TIMEOUT
-                    )
-                    elapsed = time.time() - started
-                    base = {
-                        "algorithm": alg_name,
-                        "num_nodes": n,
-                        "num_edges": m,
-                        "repeat": rep,
-                        "run_time_sec_wall": round(elapsed, 3),
-                    }
 
-                    if not finished:
-                        print("[TIMEOUT]")
-                        row = dict(base)
-                        row.update({"timeout": True})
-                        append_row(row)
-                        continue
+    # Wait for all tasks to finish
+    for fut in as_completed(futures):
+        try:
+            fut.result()
+        except Exception as e:
+            print("Task failed:", e)
 
-                    print("[OK]")
-                    # result is expected to be a dict with keys: mapping, preserved_edges, stats
-                    preserved = (
-                        result.get("preserved_edges")
-                        if isinstance(result, dict)
-                        else None
-                    )
-                    preserved_count = len(preserved) if preserved else 0
-                    stats = (
-                        result.get("stats") if isinstance(result, dict) else {}
-                    ) or {}
-
-                    row = dict(base)
-                    row.update(
-                        {
-                            "timeout": False,
-                            "preserved_edges_count": preserved_count,
-                        }
-                    )
-                    # flatten stats into row and append
-                    for k, v in stats.items():
-                        row[k] = v
-                    append_row(row)
-
-    # collect all keys for CSV header
-    all_keys = set()
-    for r in rows:
-        all_keys.update(r.keys())
-
-    # order columns: algorithm,num_nodes,num_edges,repeat,timeout,preserved_edges_count,run_time_sec_wall, then stats keys
-    preferred = [
-        "algorithm",
-        "num_nodes",
-        "num_edges",
-        "repeat",
-        "timeout",
-        "preserved_edges_count",
-        "run_time_sec_wall",
-    ]
-    rest = sorted(k for k in all_keys if k not in preferred)
-    header = preferred + rest
-
-    # Create timestamped results folder
-    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-    results_dir = os.path.join(RESULTS_ROOT, timestamp)
-    os.makedirs(results_dir, exist_ok=True)
-
-    out_path = os.path.abspath(os.path.join(results_dir, OUTPUT_CSV))
-    with open(out_path, "w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=header)
-        writer.writeheader()
-        for r in rows:
-            # ensure all keys present
-            out = {k: r.get(k, "") for k in header}
-            writer.writerow(out)
-
-    # Also write a small metadata file for the run
-    meta = {
-        "generated_at": timestamp,
-        "n_min": N_MIN,
-        "n_max": N_MAX,
-        "repeats": REPEATS,
-        "edge_multipliers": EDGE_MULTIPLIERS,
-        "per_call_timeout": PER_CALL_TIMEOUT,
-        "random_seed": RANDOM_SEED,
-    }
-    try:
-        import json
-
-        with open(os.path.join(results_dir, "metadata.json"), "w") as mf:
-            json.dump(meta, mf, indent=2)
-    except Exception:
-        pass
-
+    executor.shutdown()
     print(f"Benchmark finished. Results written to {out_path}")
 
 
