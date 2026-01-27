@@ -51,15 +51,30 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
     elapsed_ms = (time.time() - start) * 1000.0
 
+    # Metrics
+    mces_size = len(best_preserved_edges)
+    mapping_quality = mces_size / max(1, len(graph1.edges)) if graph1.edges else 0.0
+    solution_optimality = True  # brute-force is optimal
+    # Memory usage placeholder (can be replaced with actual measurement)
+    import os
+
+    import psutil
+
+    process = psutil.Process(os.getpid())
+    memory_usage_mb = process.memory_info().rss / 1024 / 1024
+
     return {
         "mapping": best_mapping,
         "preserved_edges": [[u, v] for u, v in best_preserved_edges],
         "stats": {
             "time_ms": elapsed_ms,
             "mappings_explored": mappings_explored,
-            # Not applicable for naïve enumeration but kept for schema consistency.
             "recursive_calls": 0,
             "pruned_branches": 0,
+            "mces_size": mces_size,
+            "mapping_quality": mapping_quality,
+            "solution_optimality": solution_optimality,
+            "memory_usage_mb": memory_usage_mb,
         },
     }
 

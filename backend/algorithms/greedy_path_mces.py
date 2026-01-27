@@ -129,6 +129,15 @@ def compute_mces_greedy_path(
     stats.mappings_explored = 0
     stats.recursive_calls = 0
 
+    mces_size = len(preserved_edges)
+    mapping_quality = mces_size / max(1, len(graph1.edges)) if graph1.edges else 0.0
+    solution_optimality = False  # Greedy is heuristic
+    import os
+
+    import psutil
+
+    process = psutil.Process(os.getpid())
+    memory_usage_mb = process.memory_info().rss / 1024 / 1024
     return {
         "mapping": mapping,
         "preserved_edges": [[u, v] for u, v in preserved_edges],
@@ -137,5 +146,9 @@ def compute_mces_greedy_path(
             "mappings_explored": stats.mappings_explored,
             "recursive_calls": stats.recursive_calls,
             "pruned_branches": stats.pruned_branches,
+            "mces_size": mces_size,
+            "mapping_quality": mapping_quality,
+            "solution_optimality": solution_optimality,
+            "memory_usage_mb": memory_usage_mb,
         },
     }

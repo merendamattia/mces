@@ -13,6 +13,41 @@ const algConnected = document.getElementById("alg-connected");
 const algGreedyPath = document.getElementById("alg-greedy-path");
 const selectAllAlgorithms = document.getElementById("select-all-algorithms");
 const algoCheckboxes = document.querySelectorAll(".algo-checkbox");
+const statsTableBody = document.getElementById("stats-table-body");
+const statsTableHead = document.getElementById("stats-table-head");
+// dynamic statistic column keys (excluding time_ms which has its own column)
+let statColumns = [];
+
+function resetStatsTableHeaders() {
+  statColumns = [];
+  if (!statsTableHead) return;
+  // reset to base header: Algorithm | Preserved Edges | Time
+  statsTableHead.innerHTML = `<tr><th>Algorithm</th><th>Preserved Edges</th><th>Time</th></tr>`;
+}
+
+function ensureStatColumns(keys) {
+  if (!statsTableHead) return;
+  const row = statsTableHead.querySelector('tr');
+  keys.forEach((k) => {
+    if (k === 'time_ms') return; // time is its own column
+    if (!statColumns.includes(k)) {
+      statColumns.push(k);
+      const th = document.createElement('th');
+      th.textContent = k.replace(/_/g, ' ');
+      row.appendChild(th);
+
+      // add placeholder cell to existing body rows
+      Array.from(statsTableBody.children).forEach(r => {
+        const td = document.createElement('td');
+        td.textContent = '-';
+        r.appendChild(td);
+      });
+    }
+  });
+}
+
+// initialize headers on load
+resetStatsTableHeaders();
 
 // Global state
 let lastGraph1 = null;
@@ -41,6 +76,8 @@ async function handleGenerateGraph1() {
     const positions1 = renderGraph("graph1", lastGraph1, "graph1", []);
     cachedPositions1 = positions1;
     algoResults.innerHTML = ""; // Clear previous results
+    if (statsTableBody) statsTableBody.innerHTML = "";
+    resetStatsTableHeaders();
   } catch (err) {
     alert(err.message || "Failed to generate Graph 1");
     console.error(err);
@@ -70,6 +107,8 @@ async function handleGenerateGraph2() {
     const positions2 = renderGraph("graph2", lastGraph2, "graph2", []);
     cachedPositions2 = positions2;
     algoResults.innerHTML = ""; // Clear previous results
+    if (statsTableBody) statsTableBody.innerHTML = "";
+    resetStatsTableHeaders();
   } catch (err) {
     alert(err.message || "Failed to generate Graph 2");
     console.error(err);
@@ -124,6 +163,8 @@ async function handleRunMces() {
 
   runMcesBtn.disabled = true;
   algoResults.innerHTML = ""; // Clear previous results
+  if (statsTableBody) statsTableBody.innerHTML = "";
+  resetStatsTableHeaders();
 
   try {
     const promises = selected.map((alg) => {
@@ -183,6 +224,41 @@ function renderAlgorithmResult(entry) {
   const algoName = algoNames[algorithm] || algorithm;
   const preservedCount = (result.preserved_edges || []).length;
   const stats = result.stats || {};
+
+  // Append row to the statistics table (adds a new row as soon as an algorithm finishes)
+  // Ensure header columns exist for the keys in stats (excluding time_ms)
+  const statKeys = Object.keys(stats || {}).filter(k => k !== 'time_ms');
+  ensureStatColumns(statKeys);
+
+  if (statsTableBody) {
+    const timeMs = stats.time_ms || null;
+    const timeStr = timeMs != null ? (timeMs / 1000).toFixed(3) + 's' : '-';
+
+    const row = document.createElement('tr');
+    // base cells
+    const algoTd = document.createElement('td'); algoTd.textContent = algoName;
+    const preservedTd = document.createElement('td'); preservedTd.textContent = preservedCount; preservedTd.style.color = color;
+    const timeTd = document.createElement('td'); timeTd.textContent = timeStr;
+    row.appendChild(algoTd);
+    row.appendChild(preservedTd);
+    row.appendChild(timeTd);
+
+    // stat columns in order of statColumns
+    statColumns.forEach((col) => {
+      const td = document.createElement('td');
+      const v = stats[col];
+      if (v == null) {
+        td.textContent = '-';
+      } else if (typeof v === 'number') {
+        td.textContent = Number.isInteger(v) ? v : v.toFixed(2);
+      } else {
+        td.textContent = String(v);
+      }
+      row.appendChild(td);
+    });
+
+    statsTableBody.appendChild(row);
+  }
 
   // Build stats list
   const statsList = Object.entries(stats)
