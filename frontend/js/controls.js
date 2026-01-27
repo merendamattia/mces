@@ -37,11 +37,12 @@ function ensureStatColumns(keys) {
       row.appendChild(th);
 
       // add placeholder cell to existing body rows
-      Array.from(statsTableBody.children).forEach(r => {
-        const td = document.createElement('td');
-        td.textContent = '-';
-        r.appendChild(td);
-      });
+        Array.from(statsTableBody.children).forEach(r => {
+          const td = document.createElement('td');
+          td.textContent = '-';
+          td.classList.add('numeric', 'monospace');
+          r.appendChild(td);
+        });
     }
   });
 }
@@ -239,6 +240,9 @@ function renderAlgorithmResult(entry) {
     const algoTd = document.createElement('td'); algoTd.textContent = algoName;
     const preservedTd = document.createElement('td'); preservedTd.textContent = preservedCount; preservedTd.style.color = color;
     const timeTd = document.createElement('td'); timeTd.textContent = timeStr;
+    // consistent classes for numeric/monospace alignment
+    preservedTd.classList.add('preserved-count', 'numeric');
+    timeTd.classList.add('numeric', 'monospace');
     row.appendChild(algoTd);
     row.appendChild(preservedTd);
     row.appendChild(timeTd);
@@ -251,6 +255,7 @@ function renderAlgorithmResult(entry) {
         td.textContent = '-';
       } else if (typeof v === 'number') {
         td.textContent = Number.isInteger(v) ? v : v.toFixed(2);
+        td.classList.add('numeric', 'monospace');
       } else {
         td.textContent = String(v);
       }
