@@ -7,6 +7,9 @@ __pycache__/
 *.pyd
 *.pdb
 
+# Benchmarks
+results/
+
 # Virtual environments
 .venv/
 venv/
