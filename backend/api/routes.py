@@ -6,7 +6,7 @@ from algorithms import (
     compute_mces_connected,
     compute_mces_greedy_path,
 )
-from algorithms.ilp_r2 import ilp_r2_mces
+from algorithms.ilp_r2 import compute_mces_ilp_r2
 from core.generator import generate_random_graph_pair
 from core.graph import Graph
 from flask import Blueprint, jsonify, request
@@ -107,12 +107,12 @@ def run_greedy_path_mces():
 
 
 @api_bp.route("/mces/ilp_r2", methods=["POST"])
-def run_ilp_r2_mces():
+def run_compute_mces_ilp_r2():
     payload = request.get_json(silent=True) or {}
     g1, g2, err_resp, status = _parse_graphs_payload(payload)
     if err_resp:
         return err_resp, status
-    result = ilp_r2_mces(g1, g2)
+    result = compute_mces_ilp_r2(g1, g2)
 
     # Extract preserved nodes and edges for response
     preserved_nodes = result.get("preserved_nodes", [])

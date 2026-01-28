@@ -9,7 +9,7 @@ from pulp import LpMaximize, LpProblem, LpVariable, lpSum
 tracemalloc.start()
 
 
-def ilp_r2_mces(graph_g, graph_h):
+def compute_mces_ilp_r2(graph_g, graph_h):
     """
     Solve the Maximum Common Edge Subgraph (MCES) problem using the ILP R2 formulation.
 

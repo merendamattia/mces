@@ -5,7 +5,7 @@ and performance characteristics.
 """
 from algorithms.brute_force import compute_mces as brute_force_mces
 from algorithms.brute_force_arcmatch import compute_mces as arcmatch_mces
-from algorithms.ilp_r2 import ilp_r2_mces
+from algorithms.ilp_r2 import compute_mces_ilp_r2
 from core.graph import Graph
 
 
@@ -254,7 +254,7 @@ class TestIlpR2MCES:
         """Test ILP R2 on empty graphs."""
         g1 = Graph()
         g2 = Graph()
-        result = ilp_r2_mces(g1, g2)
+        result = compute_mces_ilp_r2(g1, g2)
 
         assert result["node_mapping"] == {}
         assert result["edge_mapping"] == []
@@ -267,7 +267,7 @@ class TestIlpR2MCES:
         g2 = Graph()
         g2.add_node("1")
 
-        result = ilp_r2_mces(g1, g2)
+        result = compute_mces_ilp_r2(g1, g2)
 
         assert isinstance(result["node_mapping"], dict)
         assert result["edge_mapping"] == []
@@ -289,7 +289,7 @@ class TestIlpR2MCES:
         g2.add_edge("1", "2")
         g2.add_edge("2", "3")
 
-        result = ilp_r2_mces(g1, g2)
+        result = compute_mces_ilp_r2(g1, g2)
 
         # Validate the objective value
         assert result["objective_value"] == 2
