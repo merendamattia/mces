@@ -129,7 +129,11 @@ def ilp_r2_mces(graph_g, graph_h):
     # Metrics
     mces_size = len(preserved_edges)
     mapping_quality = mces_size / max(1, len(edges_g)) if edges_g else 0.0
-    solution_optimality = True
+    # Enhanced solution optimality check
+    max_possible_edges = len(set(edges_g).intersection(set(edges_h)))
+    solution_optimality = (
+        problem.status == 1 and len(preserved_edges) <= max_possible_edges
+    )
 
     return {
         "mapping": mapping,
