@@ -180,19 +180,19 @@ class TestIlpR2Endpoint:
     """Test suite for /api/mces/ilp_r2 endpoint."""
 
     def test_ilp_r2_valid_request(self, client):
-        """Test ILP R2 with valid graph inputs."""
-        graph1 = {
-            "nodes": [{"id": "1"}, {"id": "2"}],
-            "edges": [{"source": "1", "target": "2"}],
-        }
-        graph2 = {
-            "nodes": [{"id": "A"}, {"id": "B"}],
-            "edges": [{"source": "A", "target": "B"}],
-        }
-
+        """Test ILP R2 with valid input."""
         response = client.post(
             "/api/mces/ilp_r2",
-            json={"graph1": graph1, "graph2": graph2},
+            json={
+                "graph1": {
+                    "nodes": [{"id": "1"}, {"id": "2"}],
+                    "edges": [{"source": "1", "target": "2"}],
+                },
+                "graph2": {
+                    "nodes": [{"id": "A"}, {"id": "B"}],
+                    "edges": [{"source": "A", "target": "B"}],
+                },
+            },
             content_type="application/json",
         )
 
@@ -201,9 +201,10 @@ class TestIlpR2Endpoint:
 
         assert data["algorithm"] == "ilp_r2"
         assert "result" in data
-        assert "node_mapping" in data["result"]
-        assert "edge_mapping" in data["result"]
-        assert "objective_value" in data["result"]
+        assert "mapping" in data["result"]
+        assert "preserved_edges" in data["result"]
+        assert "stats" in data["result"]
+        assert "mces_size" in data["result"]["stats"]
 
     def test_ilp_r2_invalid_request(self, client):
         """Test ILP R2 with invalid input format."""

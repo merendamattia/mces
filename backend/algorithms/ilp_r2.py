@@ -39,7 +39,7 @@ def compute_mces_ilp_r2(graph_g, graph_h):
 
     # Objective function: Maximize the number of common edges
     problem += (
-        lpSum(z[u1, v2] for u1 in nodes_g for v2 in nodes_h) / 2,
+        lpSum(z[u1, v2] for u1 in nodes_g for v2 in nodes_h),
         "Maximize_Common_Edges",
     )
 
@@ -61,15 +61,13 @@ def compute_mces_ilp_r2(graph_g, graph_h):
     for u1 in nodes_g:
         for v2 in nodes_h:
             neighbors_g = list(graph_g.neighbors(u1))
+            neighbors_h = list(graph_h.neighbors(v2))
+
+            # Ensure z is only 1 if both endpoints are mapped correctly
             problem += (
                 z[u1, v2] <= lpSum(x[u2, v2] for u2 in neighbors_g),
                 f"Topology_Constraint_G_{u1}_{v2}",
             )
-
-    # Constraint 4: Topological consistency (neighbors in H to G)
-    for u1 in nodes_g:
-        for v2 in nodes_h:
-            neighbors_h = list(graph_h.neighbors(v2))
             problem += (
                 z[u1, v2] <= lpSum(x[u1, v1] for v1 in neighbors_h),
                 f"Topology_Constraint_H_{u1}_{v2}",
@@ -99,6 +97,8 @@ def compute_mces_ilp_r2(graph_g, graph_h):
                 "time_ms": elapsed_ms,
                 "memory_usage_mb": memory_usage_mb,
                 "solution_optimality": False,
+                "mces_size": 0,  # Ensure mces_size is always included
+                "mapping_quality": 0.0,
             },
         }
 
