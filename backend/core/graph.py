@@ -28,3 +28,11 @@ class Graph:
                 for s, t in sorted(self.edges, key=lambda x: (int(x[0]), int(x[1])))
             ],
         }
+
+    def neighbors(self, node_id: str) -> Set[str]:
+        """Return the neighbors of a given node."""
+        return {
+            target if source == node_id else source
+            for source, target in self.edges
+            if node_id in (source, target)
+        }

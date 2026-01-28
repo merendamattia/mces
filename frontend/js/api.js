@@ -94,3 +94,27 @@ async function requestMcesGreedyPath(graph1, graph2, maxPathLen = 4) {
   }
   return response.json();
 }
+
+/**
+ * Executes the ILP R2 MCES algorithm on two graphs.
+ * This algorithm uses Integer Linear Programming to find the Maximum Common Edge Subgraph.
+ *
+ * @param {Object} graph1 - First graph object with nodes and edges
+ * @param {Object} graph2 - Second graph object with nodes and edges
+ * @returns {Promise<Object>} Response containing algorithm results (preserved_edges, mapping, stats)
+ * @throws {Error} If the request fails or returns an error
+ */
+async function requestMcesIlpR2(graph1, graph2) {
+  const response = await fetch(`${API_BASE}/api/mces/ilp_r2`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ graph1, graph2 })
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Request failed" }));
+    throw new Error(error.error || "Request failed");
+  }
+
+  return response.json();
+}

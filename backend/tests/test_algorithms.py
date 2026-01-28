@@ -5,6 +5,7 @@ and performance characteristics.
 """
 from algorithms.brute_force import compute_mces as brute_force_mces
 from algorithms.brute_force_arcmatch import compute_mces as arcmatch_mces
+from algorithms.ilp_r2 import ilp_r2_mces
 from core.graph import Graph
 
 
@@ -244,3 +245,59 @@ class TestAlgorithmConsistency:
 
         # ArcMatch should perform pruning
         assert result_am["stats"]["pruned_branches"] >= 0
+
+
+class TestIlpR2MCES:
+    """Test suite for ILP R2 MCES algorithm."""
+
+    def test_empty_graphs(self):
+        """Test ILP R2 on empty graphs."""
+        g1 = Graph()
+        g2 = Graph()
+        result = ilp_r2_mces(g1, g2)
+
+        assert result["node_mapping"] == {}
+        assert result["edge_mapping"] == []
+        assert result["objective_value"] == 0
+
+    def test_single_node_graphs(self):
+        """Test ILP R2 on single-node graphs with no edges."""
+        g1 = Graph()
+        g1.add_node("1")
+        g2 = Graph()
+        g2.add_node("1")
+
+        result = ilp_r2_mces(g1, g2)
+
+        assert isinstance(result["node_mapping"], dict)
+        assert result["edge_mapping"] == []
+        assert result["objective_value"] == 0
+
+    def test_identical_graphs(self):
+        """Test ILP R2 on identical graphs (should preserve all edges)."""
+        g1 = Graph()
+        g1.add_node("1")
+        g1.add_node("2")
+        g1.add_node("3")
+        g1.add_edge("1", "2")
+        g1.add_edge("2", "3")
+
+        g2 = Graph()
+        g2.add_node("1")
+        g2.add_node("2")
+        g2.add_node("3")
+        g2.add_edge("1", "2")
+        g2.add_edge("2", "3")
+
+        result = ilp_r2_mces(g1, g2)
+
+        # Validate the objective value
+        assert result["objective_value"] == 2
+
+        # Validate the node mapping
+        assert set(result["node_mapping"].keys()) == {"1", "2", "3"}
+        assert set(result["node_mapping"].values()) == {"1", "2", "3"}
+
+        # Validate the edge mapping
+        expected_edges = {("1", "2"), ("2", "3")}
+        assert set(result["edge_mapping"]) == expected_edges
