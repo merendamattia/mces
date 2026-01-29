@@ -12,6 +12,7 @@ const algArcmatch = document.getElementById("alg-bruteforce-arcmatch");
 const algConnected = document.getElementById("alg-connected");
 const algGreedyPath = document.getElementById("alg-greedy-path");
 const algIlpR2 = document.getElementById("alg-ilp-r2");
+const algSimulatedAnnealing = document.getElementById("alg-simulated-annealing");
 const selectAllAlgorithms = document.getElementById("select-all-algorithms");
 const algoCheckboxes = document.querySelectorAll(".algo-checkbox");
 const statsTableBody = document.getElementById("stats-table-body");
@@ -158,6 +159,7 @@ async function handleRunMces() {
   if (algConnected && algConnected.checked) selected.push("connected_mces");
   if (algGreedyPath && algGreedyPath.checked) selected.push("greedy_path_mces");
   if (algIlpR2 && algIlpR2.checked) selected.push("ilp_r2");
+  if (algSimulatedAnnealing && algSimulatedAnnealing.checked) selected.push("simulated_annealing_mces");
 
   if (selected.length === 0) {
     alert("Select at least one algorithm.");
@@ -182,6 +184,8 @@ async function handleRunMces() {
         promise = requestMcesGreedyPath(lastGraph1, lastGraph2);
       } else if (alg === "ilp_r2") {
         promise = requestMcesIlpR2(lastGraph1, lastGraph2);
+      } else if (alg === "simulated_annealing_mces") {
+        promise = requestMcesSimulatedAnnealing(lastGraph1, lastGraph2);
       } else {
         promise = Promise.reject(new Error("Unknown algorithm: " + alg));
       }

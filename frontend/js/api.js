@@ -118,3 +118,24 @@ async function requestMcesIlpR2(graph1, graph2) {
 
   return response.json();
 }
+
+async function requestMcesSimulatedAnnealing(graph1, graph2, initialTemperature = 100.0, coolingRate = 0.95, maxIterations = 1000) {
+  const response = await fetch(`${API_BASE}/api/mces/simulated_annealing`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      graph1,
+      graph2,
+      initial_temperature: initialTemperature,
+      cooling_rate: coolingRate,
+      max_iterations: maxIterations
+    })
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: "Request failed" }));
+    throw new Error(error.error || "Request failed");
+  }
+
+  return response.json();
+}

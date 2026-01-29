@@ -1,0 +1,30 @@
+blinker==1.9.0
+certifi @ file:///Users/ec2-user/croot/certifi_1767659246487/work/certifi
+cfgv==3.5.0
+charset-normalizer==3.4.4
+click==8.3.1
+coverage==7.13.0
+distlib==0.4.0
+filelock==3.20.1
+Flask==3.0.0
+flask-cors @ file:///Users/ec2-user/croot/flask-cors_1769432012436/work
+identify==2.6.15
+idna==3.11
+iniconfig==2.3.0
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+nodeenv==1.10.0
+packaging==25.0
+platformdirs==4.5.1
+pluggy==1.6.0
+pre_commit==4.2.0
+psutil==7.2.1
+PuLP==3.3.0
+pytest==7.4.0
+pytest-cov==4.1.0
+PyYAML==6.0.3
+requests==2.32.5
+urllib3==2.6.2
+virtualenv==20.35.4
+Werkzeug==3.1.4

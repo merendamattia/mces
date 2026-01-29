@@ -5,6 +5,7 @@ from algorithms import (
     compute_mces_bruteforce_arcmatch,
     compute_mces_connected,
     compute_mces_greedy_path,
+    compute_simulated_annealing_mces,
 )
 from algorithms.ilp_r2 import compute_mces_ilp_r2
 from core.generator import generate_random_graph_pair
@@ -126,3 +127,24 @@ def run_compute_mces_ilp_r2():
             "preserved_edges": preserved_edges,
         }
     )
+
+
+@api_bp.route("/mces/simulated_annealing", methods=["POST"])
+def run_simulated_annealing():
+    payload = request.get_json(silent=True) or {}
+    g1, g2, err_resp, status = _parse_graphs_payload(payload)
+    if err_resp:
+        return err_resp, status
+
+    initial_temperature = payload.get("initial_temperature", 100.0)
+    cooling_rate = payload.get("cooling_rate", 0.95)
+    max_iterations = payload.get("max_iterations", 1000)
+
+    result = compute_simulated_annealing_mces(
+        g1,
+        g2,
+        initial_temperature=initial_temperature,
+        cooling_rate=cooling_rate,
+        max_iterations=max_iterations,
+    )
+    return jsonify({"algorithm": "simulated_annealing", "result": result})

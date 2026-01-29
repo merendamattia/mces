@@ -8,6 +8,7 @@ from .brute_force_arcmatch import compute_mces as compute_mces_bruteforce_arcmat
 from .connected_mces import compute_mces_connected
 from .greedy_path_mces import compute_mces_greedy_path
 from .ilp_r2 import compute_mces_ilp_r2
+from .simulated_annealing_mces import compute_simulated_annealing_mces
 
 __all__ = [
     "compute_mces_bruteforce",
@@ -15,4 +16,5 @@ __all__ = [
     "compute_mces_connected",
     "compute_mces_greedy_path",
     "compute_mces_ilp_r2",
+    "compute_simulated_annealing_mces",
 ]
