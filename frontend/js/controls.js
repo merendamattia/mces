@@ -222,8 +222,8 @@ async function handleRunMces() {
  * @param {Object} entry.result - Result data including preserved_edges, mapping, and stats
  */
 function renderAlgorithmResult(entry) {
-  const colors = { bruteforce: "#0ea5e9", bruteforce_arcmatch: "#f97316", connected_mces: "#10b981", greedy_path_mces: "#8b5cf6", ilp_r2: "#3b5bfd" };
-  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_arcmatch: "Brute-Force + ArcMatch", connected_mces: "Connected MCES", greedy_path_mces: "Greedy Path MCES", ilp_r2: "ILP-R2" };
+  const colors = { bruteforce: "#0ea5e9", bruteforce_arcmatch: "#f97316", connected_mces: "#10b981", greedy_path_mces: "#8b5cf6", ilp_r2: "#3b5bfd", simulated_annealing: "#ff0000" };
+  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_arcmatch: "Brute-Force + Backtrack & Pruning", connected_mces: "Connected MCES", greedy_path_mces: "Greedy Path MCES", ilp_r2: "ILP-R2", simulated_annealing: "Simulated Annealing MCES" };
 
   const { algorithm, result } = entry;
   const idx = algoResults.children.length; // Use current number of children as index

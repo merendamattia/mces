@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 from core.graph import Graph
 
 
-def compute_simulated_annealing_mces(
+def compute_mces_simulated_annealing(
     graph1: Graph,
     graph2: Graph,
     initial_temperature: float = 100.0,

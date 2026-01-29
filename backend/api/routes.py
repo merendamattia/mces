@@ -5,7 +5,7 @@ from algorithms import (
     compute_mces_bruteforce_arcmatch,
     compute_mces_connected,
     compute_mces_greedy_path,
-    compute_simulated_annealing_mces,
+    compute_mces_simulated_annealing,
 )
 from algorithms.ilp_r2 import compute_mces_ilp_r2
 from core.generator import generate_random_graph_pair
@@ -140,7 +140,7 @@ def run_simulated_annealing():
     cooling_rate = payload.get("cooling_rate", 0.95)
     max_iterations = payload.get("max_iterations", 1000)
 
-    result = compute_simulated_annealing_mces(
+    result = compute_mces_simulated_annealing(
         g1,
         g2,
         initial_temperature=initial_temperature,
