@@ -31,6 +31,7 @@ from backend.algorithms import (
     compute_mces_connected,
     compute_mces_greedy_path,
     compute_mces_ilp_r2,
+    compute_mces_simulated_annealing,
 )
 from backend.core.generator import generate_random_graph_pair
 
@@ -120,6 +121,7 @@ def main():
         ("connected_mces", compute_mces_connected),
         ("greedy_path_mces", compute_mces_greedy_path),
         ("ilp_r2", compute_mces_ilp_r2),
+        ("simulated_annealing", compute_mces_simulated_annealing),
     ]
 
     # We'll write rows incrementally to CSV with a file lock to ensure consistency
