@@ -97,10 +97,11 @@ def compute_mces_ilp_r2(graph_g, graph_h):
                 "time_ms": elapsed_ms,
                 "memory_usage_mb": memory_usage_mb,
                 "solution_optimality": False,
-                "mces_size": 0,  # Ensure mces_size is always included
-                "mapping_quality": 0.0,
+                "search_space_size": 0,
             },
         }
+
+    solution_optimality = problem.status == 1
 
     # Extract the solution
     mapping = {}
@@ -126,14 +127,9 @@ def compute_mces_ilp_r2(graph_g, graph_h):
         if u in mapping and v in mapping and (mapping[u], mapping[v]) in edges_h
     ]
 
-    # Metrics
-    mces_size = len(preserved_edges)
-    mapping_quality = mces_size / max(1, len(edges_g)) if edges_g else 0.0
-    # Enhanced solution optimality check
-    max_possible_edges = len(set(edges_g).intersection(set(edges_h)))
-    solution_optimality = (
-        problem.status == 1 and len(preserved_edges) <= max_possible_edges
-    )
+    search_space_size = len(nodes_g) * len(nodes_h)
+
+    mappings_explored = sum(1 for u, v in x if x[u, v].varValue == 1)
 
     return {
         "mapping": mapping,
@@ -142,7 +138,7 @@ def compute_mces_ilp_r2(graph_g, graph_h):
             "time_ms": elapsed_ms,
             "memory_usage_mb": memory_usage_mb,
             "solution_optimality": solution_optimality,
-            "mces_size": mces_size,
-            "mapping_quality": mapping_quality,
+            "search_space_size": search_space_size,
+            "mappings_explored": mappings_explored,
         },
     }

@@ -32,7 +32,9 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
     if len(nodes1) > len(nodes2):
         elapsed_ms = (time.time() - start) * 1000.0
-        return _result(best_mapping, best_preserved_edges, stats, elapsed_ms, graph1)
+        return _result(
+            best_mapping, best_preserved_edges, stats, elapsed_ms, graph1, graph2
+        )
 
     used_targets = set()
     current_mapping: Dict[str, str] = {}
@@ -79,7 +81,9 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
     backtrack(0)
 
     elapsed_ms = (time.time() - start) * 1000.0
-    return _result(best_mapping, best_preserved_edges, stats, elapsed_ms, graph1)
+    return _result(
+        best_mapping, best_preserved_edges, stats, elapsed_ms, graph1, graph2
+    )
 
 
 # Helpers
@@ -166,10 +170,12 @@ def _result(
     stats: ArcMatchStats,
     elapsed_ms: float,
     graph1: Graph,
+    graph2: Graph,
 ) -> Dict[str, object]:
-    mces_size = len(best_preserved_edges)
-    mapping_quality = mces_size / max(1, len(graph1.edges)) if graph1.edges else 0.0
+    search_space_size = len(graph1.nodes) * len(graph2.nodes)
+
     solution_optimality = True  # ArcMatch is optimal for small graphs
+
     import os
 
     import psutil
@@ -184,10 +190,8 @@ def _result(
             "mappings_explored": stats.mappings_explored,
             "recursive_calls": stats.recursive_calls,
             "pruned_branches": stats.pruned_branches,
-            "valid_edge_checks": stats.valid_edge_checks,
-            "mces_size": mces_size,
-            "mapping_quality": mapping_quality,
-            "solution_optimality": solution_optimality,
+            "search_space_size": search_space_size,
             "memory_usage_mb": memory_usage_mb,
+            "solution_optimality": solution_optimality,
         },
     }

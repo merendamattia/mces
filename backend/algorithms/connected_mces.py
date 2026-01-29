@@ -11,7 +11,6 @@ class ArcMatchStats:
         self.recursive_calls = 0
         self.pruned_branches = 0
         self.mappings_explored = 0
-        self.valid_edge_checks = 0
 
 
 def _preserved_edges(
@@ -19,7 +18,6 @@ def _preserved_edges(
 ) -> List[Tuple[str, str]]:
     preserved: List[Tuple[str, str]] = []
     for u, v in graph1.edges:
-        stats.valid_edge_checks += 1
         if u in mapping and v in mapping:
             mu, mv = mapping[u], mapping[v]
             if tuple(sorted((mu, mv))) in graph2.edges:
@@ -47,7 +45,6 @@ def _can_potentially_improve(
         v_mapped = v in mapped_nodes
 
         if u_mapped and v_mapped:
-            stats.valid_edge_checks += 1
             mu, mv = current_mapping[u], current_mapping[v]
             if tuple(sorted((mu, mv))) in graph2.edges:
                 already_preserved += 1
@@ -63,10 +60,12 @@ def _result(
     stats: ArcMatchStats,
     elapsed_ms: float,
     graph1: Graph,
+    graph2: Graph,
 ) -> Dict[str, object]:
-    mces_size = len(best_preserved_edges)
-    mapping_quality = mces_size / max(1, len(graph1.edges)) if graph1.edges else 0.0
-    solution_optimality = True  # Connected MCES is optimal for small graphs
+    search_space_size = len(graph1.nodes) * len(graph2.nodes)
+
+    solution_optimality = True
+
     import os
 
     import psutil
@@ -81,11 +80,9 @@ def _result(
             "mappings_explored": stats.mappings_explored,
             "recursive_calls": stats.recursive_calls,
             "pruned_branches": stats.pruned_branches,
-            "valid_edge_checks": stats.valid_edge_checks,
-            "mces_size": mces_size,
-            "mapping_quality": mapping_quality,
-            "solution_optimality": solution_optimality,
+            "search_space_size": search_space_size,
             "memory_usage_mb": memory_usage_mb,
+            "solution_optimality": solution_optimality,
         },
     }
 
@@ -108,7 +105,9 @@ def compute_mces_connected(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
     if len(nodes1) > len(nodes2):
         elapsed_ms = (time.time() - start) * 1000.0
-        return _result(best_mapping, best_preserved_edges, stats, elapsed_ms, graph1)
+        return _result(
+            best_mapping, best_preserved_edges, stats, elapsed_ms, graph1, graph2
+        )
 
     used_targets = set()
     current_mapping: Dict[str, str] = {}
@@ -175,4 +174,6 @@ def compute_mces_connected(graph1: Graph, graph2: Graph) -> Dict[str, object]:
     backtrack(0)
 
     elapsed_ms = (time.time() - start) * 1000.0
-    return _result(best_mapping, best_preserved_edges, stats, elapsed_ms, graph1)
+    return _result(
+        best_mapping, best_preserved_edges, stats, elapsed_ms, graph1, graph2
+    )

@@ -55,7 +55,7 @@ def compute_mces_simulated_annealing(
     process = psutil.Process(os.getpid())
     memory_usage_mb = process.memory_info().rss / 1024 / 1024
 
-    mapping_quality = best_score / max(1, len(graph1.edges)) if graph1.edges else 0.0
+    search_space_size = len(graph1.nodes) * len(graph2.nodes)
 
     solution_optimality = False  # Simulated Annealing is a heuristic approach, so it does not guarantee optimality
 
@@ -64,10 +64,9 @@ def compute_mces_simulated_annealing(
         "preserved_edges": get_preserved_edges(best_alignment, graph1, graph2),
         "stats": {
             "time_ms": elapsed_ms,
-            "mces_size": best_score,
-            "mapping_quality": mapping_quality,
             "mappings_explored": mappings_explored,
             "memory_usage_mb": memory_usage_mb,
+            "search_space_size": search_space_size,
             "solution_optimality": solution_optimality,
         },
     }

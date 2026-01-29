@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import itertools
+import os
 import time
 from typing import Dict, List, Tuple
 
+import psutil
 from core.graph import Graph
 
 
@@ -41,9 +43,10 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
         preserved = []
         for u, v in graph1.edges:
-            mu, mv = mapping[u], mapping[v]
-            if tuple(sorted((mu, mv))) in graph2.edges:
-                preserved.append((u, v))
+            if u in mapping and v in mapping:
+                mu, mv = mapping[u], mapping[v]
+                if tuple(sorted((mu, mv))) in graph2.edges:
+                    preserved.append((u, v))
 
         if len(preserved) > len(best_preserved_edges):
             best_mapping = mapping
@@ -51,17 +54,12 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
     elapsed_ms = (time.time() - start) * 1000.0
 
-    # Metrics
-    mces_size = len(best_preserved_edges)
-    mapping_quality = mces_size / max(1, len(graph1.edges)) if graph1.edges else 0.0
-    solution_optimality = True  # brute-force is optimal
-    # Memory usage placeholder (can be replaced with actual measurement)
-    import os
-
-    import psutil
-
     process = psutil.Process(os.getpid())
     memory_usage_mb = process.memory_info().rss / 1024 / 1024
+
+    search_space_size = len(nodes1) * len(nodes2)
+
+    solution_optimality = True  # Brute-force guarantees optimality
 
     return {
         "mapping": best_mapping,
@@ -71,12 +69,8 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
             "mappings_explored": mappings_explored,
             "recursive_calls": 0,
             "pruned_branches": 0,
-            "mces_size": mces_size,
-            "mapping_quality": mapping_quality,
-            "solution_optimality": solution_optimality,
+            "search_space_size": search_space_size,
             "memory_usage_mb": memory_usage_mb,
+            "solution_optimality": solution_optimality,
         },
     }
-
-
-# Extension point: future variants (e.g., heuristic ordering) can branch from here.

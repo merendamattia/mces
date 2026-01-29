@@ -204,7 +204,8 @@ class TestIlpR2Endpoint:
         assert "mapping" in data["result"]
         assert "preserved_edges" in data["result"]
         assert "stats" in data["result"]
-        assert "mces_size" in data["result"]["stats"]
+        assert "search_space_size" in data["result"]["stats"]
+        assert "solution_optimality" in data["result"]["stats"]
 
     def test_ilp_r2_invalid_request(self, client):
         """Test ILP R2 with invalid input format."""
