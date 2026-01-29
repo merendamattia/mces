@@ -160,9 +160,7 @@ def main():
         "mappings_explored",
         "recursive_calls",
         "pruned_branches",
-        "valid_edge_checks",
-        "mces_size",
-        "mapping_quality",
+        "search_space_size",
         "solution_optimality",
         "memory_usage_mb",
     ]
