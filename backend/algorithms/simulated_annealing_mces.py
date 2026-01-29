@@ -24,7 +24,8 @@ def compute_simulated_annealing_mces(
 
     temperature = initial_temperature
 
-    for iteration in range(max_iterations):
+    mappings_explored = 0
+    while temperature > 0.001 and mappings_explored < max_iterations:
         # Perturbation and local search
         candidate_alignment = perturb_solution(current_alignment)
         candidate_alignment = greedy_local_search(candidate_alignment, graph1, graph2)
@@ -42,10 +43,7 @@ def compute_simulated_annealing_mces(
 
         # Cooling schedule
         temperature *= cooling_rate
-
-        # Convergence check
-        if temperature < 0.001:
-            break
+        mappings_explored += 1
 
     elapsed_ms = (time.time() - start) * 1000.0
 
@@ -57,13 +55,20 @@ def compute_simulated_annealing_mces(
     process = psutil.Process(os.getpid())
     memory_usage_mb = process.memory_info().rss / 1024 / 1024
 
+    mapping_quality = best_score / max(1, len(graph1.edges)) if graph1.edges else 0.0
+
+    solution_optimality = False  # Simulated Annealing is a heuristic approach, so it does not guarantee optimality
+
     return {
         "mapping": best_alignment,
         "preserved_edges": get_preserved_edges(best_alignment, graph1, graph2),
         "stats": {
             "time_ms": elapsed_ms,
             "mces_size": best_score,
+            "mapping_quality": mapping_quality,
+            "mappings_explored": mappings_explored,
             "memory_usage_mb": memory_usage_mb,
+            "solution_optimality": solution_optimality,
         },
     }
 
