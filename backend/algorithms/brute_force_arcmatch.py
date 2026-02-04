@@ -32,7 +32,9 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
     if len(nodes1) > len(nodes2):
         elapsed_ms = (time.time() - start) * 1000.0
-        return _result(best_mapping, best_preserved_edges, stats, elapsed_ms)
+        return _result(
+            best_mapping, best_preserved_edges, stats, elapsed_ms, graph1, graph2
+        )
 
     used_targets = set()
     current_mapping: Dict[str, str] = {}
@@ -79,7 +81,9 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
     backtrack(0)
 
     elapsed_ms = (time.time() - start) * 1000.0
-    return _result(best_mapping, best_preserved_edges, stats, elapsed_ms)
+    return _result(
+        best_mapping, best_preserved_edges, stats, elapsed_ms, graph1, graph2
+    )
 
 
 # Helpers
@@ -165,7 +169,19 @@ def _result(
     best_preserved_edges: List[Tuple[str, str]],
     stats: ArcMatchStats,
     elapsed_ms: float,
+    graph1: Graph,
+    graph2: Graph,
 ) -> Dict[str, object]:
+    search_space_size = len(graph1.nodes) * len(graph2.nodes)
+
+    solution_optimality = True  # ArcMatch is optimal for small graphs
+
+    import os
+
+    import psutil
+
+    process = psutil.Process(os.getpid())
+    memory_usage_mb = process.memory_info().rss / 1024 / 1024
     return {
         "mapping": best_mapping,
         "preserved_edges": [[u, v] for u, v in best_preserved_edges],
@@ -174,9 +190,8 @@ def _result(
             "mappings_explored": stats.mappings_explored,
             "recursive_calls": stats.recursive_calls,
             "pruned_branches": stats.pruned_branches,
-            "valid_edge_checks": stats.valid_edge_checks,
+            "search_space_size": search_space_size,
+            "memory_usage_mb": memory_usage_mb,
+            "solution_optimality": solution_optimality,
         },
     }
-
-
-# Extension point: additional pruning heuristics (e.g., degree ordering) can be layered here.

@@ -54,10 +54,33 @@
         </label>
         <label><input type="checkbox" id="alg-bruteforce" value="bruteforce" class="algo-checkbox" /> Naïve brute-force</label>
         <label><input type="checkbox" id="alg-bruteforce-arcmatch" value="bruteforce_arcmatch" class="algo-checkbox" /> Brute-force + ArcMatch</label>
+        <label><input type="checkbox" id="alg-connected" value="connected_mces" class="algo-checkbox" /> Connected MCES (backtracking)</label>
+        <label><input type="checkbox" id="alg-greedy-path" value="greedy_path_mces" class="algo-checkbox" /> Greedy Path MCES (heuristic)</label>
+        <label><input type="checkbox" id="alg-ilp-r2" value="ilp_r2" class="algo-checkbox" /> ILP R2 (Integer Linear Programming)</label>
+        <label><input type="checkbox" id="alg-simulated-annealing" value="simulated_annealing" class="algo-checkbox" /> Simulated Annealing (SA-ILS)</label>
       </div>
       <button id="run-mces-btn">Run MCES</button>
     </div>
   </section>
+
+    <section id="stats-section" class="graph-panel results-panel">
+      <h2>Algorithm Statistics</h2>
+      <div class="table-responsive">
+        <table class="table table-sm table-striped stats-table" id="stats-table">
+          <thead id="stats-table-head">
+            <tr>
+              <th>Algorithm</th>
+              <th>Preserved Edges</th>
+              <th>Time</th>
+              <!-- dynamic stat columns appended here -->
+            </tr>
+          </thead>
+          <tbody id="stats-table-body">
+            <!-- Rows appended dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
 
   <section id="algo-results" class="results-panel">
     <!-- Per-algorithm rendered graphs will appear here -->

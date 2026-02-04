@@ -176,6 +176,51 @@ class TestMcesArcmatchEndpoint:
         assert len(data["result"]["preserved_edges"]) == 0
 
 
+class TestIlpR2Endpoint:
+    """Test suite for /api/mces/ilp_r2 endpoint."""
+
+    def test_ilp_r2_valid_request(self, client):
+        """Test ILP R2 with valid input."""
+        response = client.post(
+            "/api/mces/ilp_r2",
+            json={
+                "graph1": {
+                    "nodes": [{"id": "1"}, {"id": "2"}],
+                    "edges": [{"source": "1", "target": "2"}],
+                },
+                "graph2": {
+                    "nodes": [{"id": "A"}, {"id": "B"}],
+                    "edges": [{"source": "A", "target": "B"}],
+                },
+            },
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        data = json.loads(response.data)
+
+        assert data["algorithm"] == "ilp_r2"
+        assert "result" in data
+        assert "mapping" in data["result"]
+        assert "preserved_edges" in data["result"]
+        assert "stats" in data["result"]
+        assert "search_space_size" in data["result"]["stats"]
+        assert "solution_optimality" in data["result"]["stats"]
+
+    def test_ilp_r2_invalid_request(self, client):
+        """Test ILP R2 with invalid input format."""
+        response = client.post(
+            "/api/mces/ilp_r2",
+            json={},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+        data = json.loads(response.data)
+        assert "error" in data
+        assert data["error"] == "graph1 and graph2 are required"
+
+
 class TestCORS:
     """Test suite for CORS configuration."""
 

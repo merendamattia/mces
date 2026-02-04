@@ -402,6 +402,43 @@ footer {
   font-size: 1.1rem;
 }
 
+/* Make the statistics table visually match other card components */
+#stats-section.graph-panel {
+  padding: 1rem 1rem 1.25rem;
+}
+
+.stats-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.85rem;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid #e6edf8;
+}
+
+.stats-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  color: #1f2937;
+}
+
+.stats-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.stats-table td.numeric,
+.stats-table td.monospace {
+  text-align: right;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.stats-table .preserved-count {
+  font-weight: 700;
+}
+
 .mces-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

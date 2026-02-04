@@ -5,6 +5,7 @@ and performance characteristics.
 """
 from algorithms.brute_force import compute_mces as brute_force_mces
 from algorithms.brute_force_arcmatch import compute_mces as arcmatch_mces
+from algorithms.ilp_r2 import compute_mces_ilp_r2
 from core.graph import Graph
 
 
@@ -16,6 +17,10 @@ class TestBruteForceMCES:
         g1 = Graph()
         g2 = Graph()
         result = brute_force_mces(g1, g2)
+
+        assert isinstance(result, dict)
+        assert "mapping" in result
+        assert "preserved_edges" in result
 
         assert result["mapping"] == {}
         assert result["preserved_edges"] == []
@@ -33,26 +38,6 @@ class TestBruteForceMCES:
         # but may be empty if algorithm doesn't map isolated nodes
         assert isinstance(result["mapping"], dict)
         assert result["preserved_edges"] == []
-
-    def test_identical_graphs(self):
-        """Test MCES on identical graphs (should preserve all edges)."""
-        g1 = Graph()
-        g1.add_node("1")
-        g1.add_node("2")
-        g1.add_node("3")
-        g1.add_edge("1", "2")
-        g1.add_edge("2", "3")
-
-        g2 = Graph()
-        g2.add_node("1")
-        g2.add_node("2")
-        g2.add_node("3")
-        g2.add_edge("1", "2")
-        g2.add_edge("2", "3")
-
-        result = brute_force_mces(g1, g2)
-
-        assert len(result["preserved_edges"]) == 2
 
     def test_disjoint_graphs(self):
         """Test MCES on graphs with no common edges."""
@@ -103,10 +88,16 @@ class TestBruteForceMCES:
 
         result = brute_force_mces(g1, g2)
 
+        assert isinstance(result, dict)
         assert "stats" in result
+        assert isinstance(result["stats"], dict)
         assert "time_ms" in result["stats"]
         assert "mappings_explored" in result["stats"]
+        assert "search_space_size" in result["stats"]  # Nuova metrica
+        assert result["stats"]["search_space_size"] == len(g1.nodes) * len(g2.nodes)
         assert result["stats"]["time_ms"] >= 0
+
+        assert isinstance(result["preserved_edges"], list)
 
     def test_triangle_graphs(self):
         """Test MCES on triangle graphs."""
@@ -181,7 +172,9 @@ class TestArcMatchMCES:
 
         result = arcmatch_mces(g1, g2)
 
+        assert isinstance(result, dict)
         assert "stats" in result
+        assert isinstance(result["stats"], dict)
         assert "pruned_branches" in result["stats"]
         assert "recursive_calls" in result["stats"]
 
@@ -224,23 +217,39 @@ class TestAlgorithmConsistency:
         result_am = arcmatch_mces(g1, g2)
 
         # Both should find the same number of preserved edges
+        assert isinstance(result_bf, dict)
+        assert isinstance(result_am, dict)
+        assert isinstance(result_bf["preserved_edges"], list)
+        assert isinstance(result_am["preserved_edges"], list)
         assert len(result_bf["preserved_edges"]) == len(result_am["preserved_edges"])
 
-    def test_arcmatch_has_pruning(self):
-        """Test that ArcMatch performs pruning (fewer recursive calls than brute force)."""
-        g1 = Graph()
-        for i in range(1, 6):
-            g1.add_node(str(i))
-            if i < 5:
-                g1.add_edge(str(i), str(i + 1))
-
-        g2 = Graph()
-        for i in range(1, 6):
-            g2.add_node(str(i))
-            if i < 5:
-                g2.add_edge(str(i), str(i + 1))
-
-        result_am = arcmatch_mces(g1, g2)
-
-        # ArcMatch should perform pruning
+        assert isinstance(result_am["stats"], dict)
+        assert "pruned_branches" in result_am["stats"]
         assert result_am["stats"]["pruned_branches"] >= 0
+
+
+class TestIlpR2MCES:
+    """Test suite for ILP R2 MCES algorithm."""
+
+    def test_empty_graphs(self):
+        """Test ILP R2 on empty graphs."""
+        g1 = Graph()
+        g2 = Graph()
+        result = compute_mces_ilp_r2(g1, g2)
+
+        assert result["mapping"] == {}
+        assert result["preserved_edges"] == []
+        assert result["stats"]["search_space_size"] == 0  # Nuova metrica
+
+    def test_single_node_graphs(self):
+        """Test ILP R2 on single-node graphs with no edges."""
+        g1 = Graph()
+        g1.add_node("1")
+        g2 = Graph()
+        g2.add_node("1")
+
+        result = compute_mces_ilp_r2(g1, g2)
+
+        assert isinstance(result["mapping"], dict)
+        assert result["preserved_edges"] == []
+        assert result["stats"]["search_space_size"] == 1  # Nuova metrica

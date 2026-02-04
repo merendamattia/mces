@@ -9,8 +9,48 @@ const runMcesBtn = document.getElementById("run-mces-btn");
 const algoResults = document.getElementById("algo-results");
 const algBruteforce = document.getElementById("alg-bruteforce");
 const algArcmatch = document.getElementById("alg-bruteforce-arcmatch");
+const algConnected = document.getElementById("alg-connected");
+const algGreedyPath = document.getElementById("alg-greedy-path");
+const algIlpR2 = document.getElementById("alg-ilp-r2");
+const algSimulatedAnnealing = document.getElementById("alg-simulated-annealing");
 const selectAllAlgorithms = document.getElementById("select-all-algorithms");
 const algoCheckboxes = document.querySelectorAll(".algo-checkbox");
+const statsTableBody = document.getElementById("stats-table-body");
+const statsTableHead = document.getElementById("stats-table-head");
+// dynamic statistic column keys (excluding time_ms which has its own column)
+let statColumns = [];
+
+function resetStatsTableHeaders() {
+  statColumns = [];
+  if (!statsTableHead) return;
+  // reset to base header: Algorithm | Preserved Edges | Time
+  statsTableHead.innerHTML = `<tr><th>Algorithm</th><th>Preserved Edges</th><th>Time</th></tr>`;
+}
+
+function ensureStatColumns(keys) {
+  if (!statsTableHead) return;
+  const row = statsTableHead.querySelector('tr');
+  keys.forEach((k) => {
+    if (k === 'time_ms') return; // time is its own column
+    if (!statColumns.includes(k)) {
+      statColumns.push(k);
+      const th = document.createElement('th');
+      th.textContent = k.replace(/_/g, ' ');
+      row.appendChild(th);
+
+      // add placeholder cell to existing body rows
+        Array.from(statsTableBody.children).forEach(r => {
+          const td = document.createElement('td');
+          td.textContent = '-';
+          td.classList.add('numeric', 'monospace');
+          r.appendChild(td);
+        });
+    }
+  });
+}
+
+// initialize headers on load
+resetStatsTableHeaders();
 
 // Global state
 let lastGraph1 = null;
@@ -39,6 +79,8 @@ async function handleGenerateGraph1() {
     const positions1 = renderGraph("graph1", lastGraph1, "graph1", []);
     cachedPositions1 = positions1;
     algoResults.innerHTML = ""; // Clear previous results
+    if (statsTableBody) statsTableBody.innerHTML = "";
+    resetStatsTableHeaders();
   } catch (err) {
     alert(err.message || "Failed to generate Graph 1");
     console.error(err);
@@ -68,6 +110,8 @@ async function handleGenerateGraph2() {
     const positions2 = renderGraph("graph2", lastGraph2, "graph2", []);
     cachedPositions2 = positions2;
     algoResults.innerHTML = ""; // Clear previous results
+    if (statsTableBody) statsTableBody.innerHTML = "";
+    resetStatsTableHeaders();
   } catch (err) {
     alert(err.message || "Failed to generate Graph 2");
     console.error(err);
@@ -112,6 +156,10 @@ async function handleRunMces() {
   const selected = [];
   if (algBruteforce.checked) selected.push("bruteforce");
   if (algArcmatch.checked) selected.push("bruteforce_arcmatch");
+  if (algConnected && algConnected.checked) selected.push("connected_mces");
+  if (algGreedyPath && algGreedyPath.checked) selected.push("greedy_path_mces");
+  if (algIlpR2 && algIlpR2.checked) selected.push("ilp_r2");
+  if (algSimulatedAnnealing && algSimulatedAnnealing.checked) selected.push("simulated_annealing_mces");
 
   if (selected.length === 0) {
     alert("Select at least one algorithm.");
@@ -120,12 +168,27 @@ async function handleRunMces() {
 
   runMcesBtn.disabled = true;
   algoResults.innerHTML = ""; // Clear previous results
+  if (statsTableBody) statsTableBody.innerHTML = "";
+  resetStatsTableHeaders();
 
   try {
     const promises = selected.map((alg) => {
-      const promise = alg === "bruteforce"
-        ? requestMcesBruteforce(lastGraph1, lastGraph2)
-        : requestMcesBruteforceArcmatch(lastGraph1, lastGraph2);
+      let promise;
+      if (alg === "bruteforce") {
+        promise = requestMcesBruteforce(lastGraph1, lastGraph2);
+      } else if (alg === "bruteforce_arcmatch") {
+        promise = requestMcesBruteforceArcmatch(lastGraph1, lastGraph2);
+      } else if (alg === "connected_mces") {
+        promise = requestMcesConnected(lastGraph1, lastGraph2);
+      } else if (alg === "greedy_path_mces") {
+        promise = requestMcesGreedyPath(lastGraph1, lastGraph2);
+      } else if (alg === "ilp_r2") {
+        promise = requestMcesIlpR2(lastGraph1, lastGraph2);
+      } else if (alg === "simulated_annealing_mces") {
+        promise = requestMcesSimulatedAnnealing(lastGraph1, lastGraph2);
+      } else {
+        promise = Promise.reject(new Error("Unknown algorithm: " + alg));
+      }
 
       // Render each result as soon as it arrives
       promise.then(result => {
@@ -159,8 +222,8 @@ async function handleRunMces() {
  * @param {Object} entry.result - Result data including preserved_edges, mapping, and stats
  */
 function renderAlgorithmResult(entry) {
-  const colors = { bruteforce: "#0ea5e9", bruteforce_arcmatch: "#f97316" };
-  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_arcmatch: "Brute-Force + ArcMatch" };
+  const colors = { bruteforce: "#0ea5e9", bruteforce_arcmatch: "#f97316", connected_mces: "#10b981", greedy_path_mces: "#8b5cf6", ilp_r2: "#3b5bfd", simulated_annealing: "#ff0000" };
+  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_arcmatch: "Brute-Force + Backtrack & Pruning", connected_mces: "Connected MCES", greedy_path_mces: "Greedy Path MCES", ilp_r2: "ILP-R2", simulated_annealing: "Simulated Annealing MCES" };
 
   const { algorithm, result } = entry;
   const idx = algoResults.children.length; // Use current number of children as index
@@ -170,6 +233,35 @@ function renderAlgorithmResult(entry) {
   const algoName = algoNames[algorithm] || algorithm;
   const preservedCount = (result.preserved_edges || []).length;
   const stats = result.stats || {};
+
+  // Append row to the statistics table (adds a new row as soon as an algorithm finishes)
+  const statKeys = Object.keys(stats || {}).filter(k => k !== 'time_ms');
+  ensureStatColumns(statKeys);
+
+  if (statsTableBody) {
+    const timeMs = stats.time_ms || null;
+    const timeStr = timeMs != null ? (timeMs / 1000).toFixed(3) + 's' : '-';
+
+    const row = document.createElement('tr');
+    const algoTd = document.createElement('td'); algoTd.textContent = algoName;
+    const preservedTd = document.createElement('td'); preservedTd.textContent = preservedCount; preservedTd.style.color = color;
+    const timeTd = document.createElement('td'); timeTd.textContent = timeStr;
+    preservedTd.classList.add('preserved-count', 'numeric');
+    timeTd.classList.add('numeric', 'monospace');
+    row.appendChild(algoTd);
+    row.appendChild(preservedTd);
+    row.appendChild(timeTd);
+
+    statColumns.forEach((col) => {
+      const td = document.createElement('td');
+      const v = stats[col];
+      td.textContent = v == null ? '-' : typeof v === 'number' ? v.toFixed(2) : String(v);
+      td.classList.add('numeric', 'monospace');
+      row.appendChild(td);
+    });
+
+    statsTableBody.appendChild(row);
+  }
 
   // Build stats list
   const statsList = Object.entries(stats)
@@ -192,41 +284,31 @@ function renderAlgorithmResult(entry) {
     .join("");
 
   const card = `<div class="result-card">
-      <div class="result-header">
-        <h3 style="color: ${color}">${algoName}</h3>
-        <div class="result-stats">
-          <div class="stat-item main"><span class="stat-label">Preserved Edges:</span> <span class="stat-value" style="color: ${color}">${preservedCount}</span></div>
-          ${statsList}
-        </div>
+    <div class="result-header">
+      <h3 style="color: ${color}">${algoName}</h3>
+      <div class="result-stats">
+        <div class="stat-item main"><span class="stat-label">Preserved Edges:</span> <span class="stat-value" style="color: ${color}">${preservedCount}</span></div>
+        ${statsList}
       </div>
-      <div class="result-graphs">
-        <div class="graph-panel">
-          <h4>Graph 1</h4>
-          <svg id="${id1}" class="graph-canvas" role="img" aria-label="${algoName} Graph 1"></svg>
-        </div>
-        <div class="graph-panel">
-          <h4>Graph 2</h4>
-          <svg id="${id2}" class="graph-canvas" role="img" aria-label="${algoName} Graph 2"></svg>
-        </div>
+    </div>
+    <div class="result-graphs">
+      <div class="graph-panel">
+        <h4>Graph 1</h4>
+        <svg id="${id1}" class="graph-canvas" role="img" aria-label="${algoName} Graph 1"></svg>
       </div>
-  </div>`;
+      <div class="graph-panel">
+        <h4>Graph 2</h4>
+        <svg id="${id2}" class="graph-canvas" role="img" aria-label="${algoName} Graph 2"></svg>
+      </div>
+    </div>
+</div>`;
 
   algoResults.insertAdjacentHTML('beforeend', card);
 
-  // Render graphs with highlights
-  const preserved = result.preserved_edges || [];
-  const mapping = result.mapping || {};
-
-  const highlight1Local = preserved.map(([u, v]) => ({ source: u, target: v, color }));
-  const highlight2Local = preserved
-    .map(([u, v]) => {
-      const mu = mapping[u];
-      const mv = mapping[v];
-      if (mu && mv) return { source: mu, target: mv, color };
-      return null;
-    })
-    .filter(Boolean);
-
-  renderGraph(id1, lastGraph1, "graph1", highlight1Local, cachedPositions1);
-  renderGraph(id2, lastGraph2, "graph2", highlight2Local, cachedPositions2);
+  renderGraph(id1, lastGraph1, "graph1", result.preserved_edges.map(([u, v]) => ({ source: u, target: v, color })));
+  renderGraph(id2, lastGraph2, "graph2", result.preserved_edges.map(([u, v]) => {
+    const mu = result.mapping[u];
+    const mv = result.mapping[v];
+    return mu && mv ? { source: mu, target: mv, color } : null;
+  }).filter(Boolean));
 }
