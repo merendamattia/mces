@@ -42,7 +42,7 @@ N_MAX = 12
 # Number of random repeats per (n, m) pair
 REPEATS = 5
 # Edges selection strategy: multipliers applied to n (will be clipped to valid range)
-EDGE_MULTIPLIERS = [1, 1.5, 2]
+EDGE_MULTIPLIERS = [1.2, 1.5, 2]
 # Per-algorithm timeout in seconds
 PER_CALL_TIMEOUT = 300
 # Output CSV file
@@ -50,9 +50,9 @@ OUTPUT_CSV = "benchmark_results.csv"
 # Top-level results folder
 RESULTS_ROOT = "results"
 # Thread pool max workers for concurrent runs
-MAX_WORKERS = 4
+MAX_WORKERS = 5
 # Random seed for reproducibility (None for random)
-RANDOM_SEED = 42
+RANDOM_SEED = 9871
 # -----------------------------------------------------------------
 
 
