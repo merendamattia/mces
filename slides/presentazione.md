@@ -72,7 +72,6 @@ Richiede che il sottografo comune sia **connesso** - la formulazione più usata 
 
 ## Chimica e Biologia Molecolare
 - **Confronto di strutture molecolari**: Misura di similarità tra composti chimici
-- **~94% dei composti NCI**: Hanno strutture outerplanar, rilevanti per MCES
 - **Confronto proteine**: Identificare similarità strutturali
 
 ## Biologia Computazionale
