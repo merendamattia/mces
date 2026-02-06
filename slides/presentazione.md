@@ -393,12 +393,6 @@ Total runs: $\sum_{n=7}^{12} |\text{edge\_counts}(n)| \times 5 \times 6 \approx 
 
 ---
 
-# Results: Solution Quality
-
-![Solution Quality](img/solution_quality.svg)
-
----
-
 # Results: Search Space Exploration
 
 ![Search Space Exploration](img/search_space_exploration.svg)
