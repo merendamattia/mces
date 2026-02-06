@@ -69,6 +69,15 @@ async function requestMcesBruteforceArcmatch(graph1, graph2) {
   return response.json();
 }
 
+/**
+ * Executes the Connected MCES algorithm on two graphs.
+ * This algorithm uses backtracking to find connected common edge subgraphs.
+ *
+ * @param {Object} graph1 - First graph object with nodes and edges
+ * @param {Object} graph2 - Second graph object with nodes and edges
+ * @returns {Promise<Object>} Response containing algorithm results (preserved_edges, mapping, stats)
+ * @throws {Error} If the request fails or returns an error
+ */
 async function requestMcesConnected(graph1, graph2) {
   const response = await fetch(`${API_BASE}/api/mces/connected`, {
     method: "POST",
@@ -82,6 +91,16 @@ async function requestMcesConnected(graph1, graph2) {
   return response.json();
 }
 
+/**
+ * Executes the Greedy Path MCES algorithm on two graphs.
+ * This heuristic algorithm finds common edge subgraphs by exploring paths greedily.
+ *
+ * @param {Object} graph1 - First graph object with nodes and edges
+ * @param {Object} graph2 - Second graph object with nodes and edges
+ * @param {number} maxPathLen - Maximum path length to explore (default: 4)
+ * @returns {Promise<Object>} Response containing algorithm results (preserved_edges, mapping, stats)
+ * @throws {Error} If the request fails or returns an error
+ */
 async function requestMcesGreedyPath(graph1, graph2, maxPathLen = 4) {
   const response = await fetch(`${API_BASE}/api/mces/greedy_path`, {
     method: "POST",
@@ -119,6 +138,18 @@ async function requestMcesIlpR2(graph1, graph2) {
   return response.json();
 }
 
+/**
+ * Executes the Simulated Annealing MCES algorithm on two graphs.
+ * This metaheuristic algorithm uses simulated annealing to find common edge subgraphs.
+ *
+ * @param {Object} graph1 - First graph object with nodes and edges
+ * @param {Object} graph2 - Second graph object with nodes and edges
+ * @param {number} initialTemperature - Initial temperature for annealing (default: 100.0)
+ * @param {number} coolingRate - Cooling rate for annealing (default: 0.95)
+ * @param {number} maxIterations - Maximum number of iterations (default: 1000)
+ * @returns {Promise<Object>} Response containing algorithm results (preserved_edges, mapping, stats)
+ * @throws {Error} If the request fails or returns an error
+ */
 async function requestMcesSimulatedAnnealing(graph1, graph2, initialTemperature = 100.0, coolingRate = 0.95, maxIterations = 1000) {
   const response = await fetch(`${API_BASE}/api/mces/simulated_annealing`, {
     method: "POST",
