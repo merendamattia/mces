@@ -619,17 +619,12 @@ def plot_performance_summary(df, output_dir):
         mem_mean = algo_data["memory_usage_mb"].mean()
         mem_score = 1 / (1 + mem_mean / df["memory_usage_mb"].mean())
 
-        # Quality: higher is better
-        quality_mean = algo_data["preserved_edges_count"].mean()
-        quality_score = quality_mean / df["preserved_edges_count"].max()
-
         # Optimality: higher is better
         optimality_score = algo_data["solution_optimality"].mean()
 
         metrics[algo] = {
             "Speed": time_score,
             "Memory efficiency": mem_score,
-            "Quality": quality_score,
             "Optimality": optimality_score,
         }
 

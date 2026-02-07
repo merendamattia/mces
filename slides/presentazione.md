@@ -72,7 +72,6 @@ Richiede che il sottografo comune sia **connesso** - la formulazione più usata 
 
 ## Chimica e Biologia Molecolare
 - **Confronto di strutture molecolari**: Misura di similarità tra composti chimici
-- **~94% dei composti NCI**: Hanno strutture outerplanar, rilevanti per MCES
 - **Confronto proteine**: Identificare similarità strutturali
 
 ## Biologia Computazionale
@@ -391,12 +390,6 @@ Total runs: $\sum_{n=7}^{12} |\text{edge\_counts}(n)| \times 5 \times 6 \approx 
 # Results: Heatmap Time by Size
 
 ![Heatmap Time by Size](img/heatmap_time_by_size.svg)
-
----
-
-# Results: Solution Quality
-
-![Solution Quality](img/solution_quality.svg)
 
 ---
 
