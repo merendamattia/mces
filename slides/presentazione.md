@@ -56,12 +56,11 @@ style: |
 # Il Problema MCES
 
 ## Definizione
-Dati due grafi $G$ e $G'$, il problema MCES consiste nel trovare un grafo $H$ con il **massimo numero di archi** che sia isomorfo sia a un sottografo di $G$ che a un sottografo di $G'$.
+Dati due grafi $G$ e $G'$, il problema del Maximum Common Edge Subgraph Problem (MCES) consiste nel trovare un grafo $H$ con il **massimo numero di archi** che sia isomorfo sia a un sottografo di $G$ che a un sottografo di $G'$.
 
 ## Complessità
 - **NP-completo** per grafi generali
 - **APX-hard**: difficile da approssimare
-- Generalizza problemi noti: maximum clique, subgraph isomorphism
 
 ## Variante Connessa (MCCES)
 Richiede che il sottografo comune sia **connesso** - la formulazione più usata nelle applicazioni pratiche.
@@ -89,7 +88,7 @@ Richiede che il sottografo comune sia **connesso** - la formulazione più usata 
 # 1. Purpose and Scope
 
 ## Obiettivo del Benchmark
-Confrontare sistematicamente sei algoritmi per il problema MCES (Maximum Common Edge Subgraph) su grafi non orientati.
+Confrontare sistematicamente sei algoritmi per il problema MCES su grafi non orientati.
 
 ## Ambito
 - **Problema**: Trovare il massimo sottografo comune tra due grafi
