@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from algorithms import (
     compute_mces_bruteforce,
-    compute_mces_bruteforce_arcmatch,
+    compute_mces_bruteforce_pruning,
     compute_mces_connected,
     compute_mces_greedy_path,
     compute_mces_simulated_annealing,
@@ -71,14 +71,14 @@ def run_bruteforce():
     return jsonify({"algorithm": "bruteforce", "result": result})
 
 
-@api_bp.route("/mces/bruteforce_arcmatch", methods=["POST"])
-def run_bruteforce_arcmatch():
+@api_bp.route("/mces/bruteforce_pruning", methods=["POST"])
+def run_bruteforce_pruning():
     payload = request.get_json(silent=True) or {}
     g1, g2, err_resp, status = _parse_graphs_payload(payload)
     if err_resp:
         return err_resp, status
-    result = compute_mces_bruteforce_arcmatch(g1, g2)
-    return jsonify({"algorithm": "bruteforce_arcmatch", "result": result})
+    result = compute_mces_bruteforce_pruning(g1, g2)
+    return jsonify({"algorithm": "bruteforce_pruning", "result": result})
 
 
 @api_bp.route("/mces/connected", methods=["POST"])

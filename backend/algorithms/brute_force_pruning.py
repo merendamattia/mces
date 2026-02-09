@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 from core.graph import Graph
 
 
-class ArcMatchStats:
+class PruningStats:
     def __init__(self) -> None:
         self.recursive_calls = 0
         self.pruned_branches = 0
@@ -15,7 +15,7 @@ class ArcMatchStats:
 
 
 def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
-    """Brute-force MCES with ArcMatch pruning via backtracking.
+    """Brute-force MCES with pruning via backtracking.
 
     Suitable for small graphs (<= 8-10 nodes). Applies injectivity and
     endpoint-consistency checks during search to prune early.
@@ -28,7 +28,7 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
     best_mapping: Dict[str, str] = {}
     best_preserved_edges: List[Tuple[str, str]] = []
-    stats = ArcMatchStats()
+    stats = PruningStats()
 
     if len(nodes1) > len(nodes2):
         elapsed_ms = (time.time() - start) * 1000.0
@@ -58,7 +58,7 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
             current_mapping[node] = target
             used_targets.add(target)
 
-            # ArcMatch pruning: check if we can still beat the best solution
+            # Pruning: check if we can still beat the best solution
             can_improve = _can_potentially_improve(
                 graph1,
                 graph2,
@@ -90,7 +90,7 @@ def compute_mces(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
 
 def _preserved_edges(
-    graph1: Graph, graph2: Graph, mapping: Dict[str, str], stats: ArcMatchStats
+    graph1: Graph, graph2: Graph, mapping: Dict[str, str], stats: PruningStats
 ) -> List[Tuple[str, str]]:
     preserved: List[Tuple[str, str]] = []
     for u, v in graph1.edges:
@@ -103,9 +103,9 @@ def _preserved_edges(
 
 
 def _is_partial_mapping_consistent(
-    graph1: Graph, graph2: Graph, mapping: Dict[str, str], stats: ArcMatchStats
+    graph1: Graph, graph2: Graph, mapping: Dict[str, str], stats: PruningStats
 ) -> bool:
-    # ArcMatch rules:
+    # Pruning rules:
     # 1) If both endpoints are mapped, the corresponding edge must exist in graph2.
     # 2) Injectivity is handled by caller via used_targets set.
 
@@ -130,7 +130,7 @@ def _can_potentially_improve(
     current_index: int,
     total_nodes: int,
     best_preserved_count: int,
-    stats: ArcMatchStats,
+    stats: PruningStats,
 ) -> bool:
     """Check if current partial mapping can potentially beat the best solution.
 
@@ -167,14 +167,14 @@ def _can_potentially_improve(
 def _result(
     best_mapping: Dict[str, str],
     best_preserved_edges: List[Tuple[str, str]],
-    stats: ArcMatchStats,
+    stats: PruningStats,
     elapsed_ms: float,
     graph1: Graph,
     graph2: Graph,
 ) -> Dict[str, object]:
     search_space_size = len(graph1.nodes) * len(graph2.nodes)
 
-    solution_optimality = True  # ArcMatch is optimal for small graphs
+    solution_optimality = True  # Pruning is optimal for small graphs
 
     import os
 

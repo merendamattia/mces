@@ -129,11 +129,11 @@ class TestMcesBruteforceEndpoint:
         assert response.status_code == 400
 
 
-class TestMcesArcmatchEndpoint:
-    """Test suite for /api/mces/bruteforce_arcmatch endpoint."""
+class TestMcesPruningEndpoint:
+    """Test suite for /api/mces/bruteforce_pruning endpoint."""
 
-    def test_arcmatch_valid_request(self, client):
-        """Test MCES arcmatch with valid graphs."""
+    def test_pruning_valid_request(self, client):
+        """Test MCES pruning with valid graphs."""
         graph1 = {
             "nodes": [{"id": "1"}, {"id": "2"}, {"id": "3"}],
             "edges": [{"source": "1", "target": "2"}, {"source": "2", "target": "3"}],
@@ -144,7 +144,7 @@ class TestMcesArcmatchEndpoint:
         }
 
         response = client.post(
-            "/api/mces/bruteforce_arcmatch",
+            "/api/mces/bruteforce_pruning",
             json={"graph1": graph1, "graph2": graph2},
             content_type="application/json",
         )
@@ -154,18 +154,18 @@ class TestMcesArcmatchEndpoint:
 
         assert "algorithm" in data
         assert "result" in data
-        assert data["algorithm"] == "bruteforce_arcmatch"
+        assert data["algorithm"] == "bruteforce_pruning"
         assert "preserved_edges" in data["result"]
         assert "stats" in data["result"]
         assert "pruned_branches" in data["result"]["stats"]
 
-    def test_arcmatch_empty_graphs(self, client):
-        """Test MCES arcmatch on empty graphs."""
+    def test_pruning_empty_graphs(self, client):
+        """Test MCES pruning on empty graphs."""
         graph1 = {"nodes": [], "edges": []}
         graph2 = {"nodes": [], "edges": []}
 
         response = client.post(
-            "/api/mces/bruteforce_arcmatch",
+            "/api/mces/bruteforce_pruning",
             json={"graph1": graph1, "graph2": graph2},
             content_type="application/json",
         )

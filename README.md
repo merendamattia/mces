@@ -26,7 +26,7 @@ The Maximum Common Edge Subgraph (MCES) problem is a fundamental problem in grap
 The project includes six algorithms covering the entire spectrum of approaches:
 
 1. **Brute Force** - Complete enumeration (baseline)
-2. **Brute Force with Pruning + Backtracking** - With intelligent ArcMatch pruning
+2. **Brute Force with Pruning + Backtracking** - With intelligent pruning
 3. **Connected MCES** - Guarantees connected subgraphs
 4. **Greedy Path** - Fast constructive heuristic based on paths
 5. **ILP R2** - Integer Linear Programming with PuLP solver
@@ -146,14 +146,14 @@ pre-commit install --hook-type commit-msg
 {
   "num_nodes": 8,
   "num_edges": 12,
-  "algorithm": "bruteforce_arcmatch"
+  "algorithm": "bruteforce_pruning"
 }
 ```
 
 **Available algorithms:**
 - `"none"` - Graph generation only
 - `"bruteforce"` - Complete brute force
-- `"bruteforce_arcmatch"` - With pruning
+- `"bruteforce_pruning"` - With pruning
 - `"connected_mces"` - Connected subgraphs
 - `"greedy_path_mces"` - Greedy heuristic
 - `"ilp_r2"` - Integer Linear Programming
@@ -168,7 +168,7 @@ pre-commit install --hook-type commit-msg
   },
   "graph2": { "nodes": [...], "edges": [...] },
   "mces": {
-    "algorithm": "bruteforce_arcmatch",
+    "algorithm": "bruteforce_pruning",
     "result": {
       "mapping": {"1": "3", "2": "4"},
       "preserved_edges": [["1", "2"]],
