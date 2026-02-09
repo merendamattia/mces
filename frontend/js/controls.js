@@ -8,7 +8,7 @@ const generateG2Btn = document.getElementById("generate-g2-btn");
 const runMcesBtn = document.getElementById("run-mces-btn");
 const algoResults = document.getElementById("algo-results");
 const algBruteforce = document.getElementById("alg-bruteforce");
-const algArcmatch = document.getElementById("alg-bruteforce-arcmatch");
+const algPruning = document.getElementById("alg-bruteforce-pruning");
 const algConnected = document.getElementById("alg-connected");
 const algGreedyPath = document.getElementById("alg-greedy-path");
 const algIlpR2 = document.getElementById("alg-ilp-r2");
@@ -155,7 +155,7 @@ async function handleRunMces() {
 
   const selected = [];
   if (algBruteforce.checked) selected.push("bruteforce");
-  if (algArcmatch.checked) selected.push("bruteforce_arcmatch");
+  if (algPruning.checked) selected.push("bruteforce_pruning");
   if (algConnected && algConnected.checked) selected.push("connected_mces");
   if (algGreedyPath && algGreedyPath.checked) selected.push("greedy_path_mces");
   if (algIlpR2 && algIlpR2.checked) selected.push("ilp_r2");
@@ -176,8 +176,8 @@ async function handleRunMces() {
       let promise;
       if (alg === "bruteforce") {
         promise = requestMcesBruteforce(lastGraph1, lastGraph2);
-      } else if (alg === "bruteforce_arcmatch") {
-        promise = requestMcesBruteforceArcmatch(lastGraph1, lastGraph2);
+      } else if (alg === "bruteforce_pruning") {
+        promise = requestMcesBruteforcePruning(lastGraph1, lastGraph2);
       } else if (alg === "connected_mces") {
         promise = requestMcesConnected(lastGraph1, lastGraph2);
       } else if (alg === "greedy_path_mces") {
@@ -218,12 +218,12 @@ async function handleRunMces() {
  * Results are appended progressively as algorithms complete (no batching).
  *
  * @param {Object} entry - Algorithm result object containing algorithm name and result data
- * @param {string} entry.algorithm - Algorithm identifier ('bruteforce' or 'bruteforce_arcmatch')
+ * @param {string} entry.algorithm - Algorithm identifier ('bruteforce' or 'bruteforce_pruning')
  * @param {Object} entry.result - Result data including preserved_edges, mapping, and stats
  */
 function renderAlgorithmResult(entry) {
-  const colors = { bruteforce: "#0ea5e9", bruteforce_arcmatch: "#f97316", connected_mces: "#10b981", greedy_path_mces: "#8b5cf6", ilp_r2: "#3b5bfd", simulated_annealing: "#ff0000" };
-  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_arcmatch: "Brute-Force + Backtrack & Pruning", connected_mces: "Connected MCES", greedy_path_mces: "Greedy Path MCES", ilp_r2: "ILP-R2", simulated_annealing: "Simulated Annealing MCES" };
+  const colors = { bruteforce: "#0ea5e9", bruteforce_pruning: "#f97316", connected_mces: "#10b981", greedy_path_mces: "#8b5cf6", ilp_r2: "#3b5bfd", simulated_annealing: "#ff0000" };
+  const algoNames = { bruteforce: "Naïve Brute-Force", bruteforce_pruning: "Brute-Force + Backtrack & Pruning", connected_mces: "Connected MCES", greedy_path_mces: "Greedy Path MCES", ilp_r2: "ILP-R2", simulated_annealing: "Simulated Annealing MCES" };
 
   const { algorithm, result } = entry;
   const idx = algoResults.children.length; // Use current number of children as index

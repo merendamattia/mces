@@ -47,8 +47,8 @@ async function requestMcesBruteforce(graph1, graph2) {
 }
 
 /**
- * Executes the Brute-Force + ArcMatch MCES algorithm on two graphs.
- * This algorithm uses ArcMatch pruning to eliminate impossible branches early,
+ * Executes the Brute-Force + Pruning MCES algorithm on two graphs.
+ * This algorithm uses pruning to eliminate impossible branches early,
  * significantly improving performance over naive brute-force.
  *
  * @param {Object} graph1 - First graph object with nodes and edges
@@ -56,8 +56,8 @@ async function requestMcesBruteforce(graph1, graph2) {
  * @returns {Promise<Object>} Response containing algorithm results (preserved_edges, mapping, stats)
  * @throws {Error} If the request fails or returns an error
  */
-async function requestMcesBruteforceArcmatch(graph1, graph2) {
-  const response = await fetch(`${API_BASE}/api/mces/bruteforce_arcmatch`, {
+async function requestMcesBruteforcePruning(graph1, graph2) {
+  const response = await fetch(`${API_BASE}/api/mces/bruteforce_pruning`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ graph1, graph2 })

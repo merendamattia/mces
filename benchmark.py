@@ -27,7 +27,7 @@ if backend_path not in sys.path:
 
 from backend.algorithms import (
     compute_mces_bruteforce,
-    compute_mces_bruteforce_arcmatch,
+    compute_mces_bruteforce_pruning,
     compute_mces_connected,
     compute_mces_greedy_path,
     compute_mces_ilp_r2,
@@ -117,7 +117,7 @@ def main():
 
     algorithms = [
         ("bruteforce", compute_mces_bruteforce),
-        ("bruteforce_arcmatch", compute_mces_bruteforce_arcmatch),
+        ("bruteforce_pruning", compute_mces_bruteforce_pruning),
         ("connected_mces", compute_mces_connected),
         ("greedy_path_mces", compute_mces_greedy_path),
         ("ilp_r2", compute_mces_ilp_r2),

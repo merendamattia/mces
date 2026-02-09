@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 from core.graph import Graph
 
 
-class ArcMatchStats:
+class PruningStats:
     def __init__(self) -> None:
         self.recursive_calls = 0
         self.pruned_branches = 0
@@ -125,7 +125,7 @@ def compute_mces_greedy_path(
                 existing_set.add(tuple(sorted(e)))
 
     elapsed_ms = (time.time() - start) * 1000.0
-    stats = ArcMatchStats()
+    stats = PruningStats()
     stats.mappings_explored = 0
     stats.recursive_calls = 0
 

@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 from core.graph import Graph
 
 
-class ArcMatchStats:
+class PruningStats:
     def __init__(self) -> None:
         self.recursive_calls = 0
         self.pruned_branches = 0
@@ -14,7 +14,7 @@ class ArcMatchStats:
 
 
 def _preserved_edges(
-    graph1: Graph, graph2: Graph, mapping: Dict[str, str], stats: ArcMatchStats
+    graph1: Graph, graph2: Graph, mapping: Dict[str, str], stats: PruningStats
 ) -> List[Tuple[str, str]]:
     preserved: List[Tuple[str, str]] = []
     for u, v in graph1.edges:
@@ -33,7 +33,7 @@ def _can_potentially_improve(
     current_index: int,
     total_nodes: int,
     best_preserved_count: int,
-    stats: ArcMatchStats,
+    stats: PruningStats,
 ) -> bool:
     already_preserved = 0
     potentially_preservable = 0
@@ -57,7 +57,7 @@ def _can_potentially_improve(
 def _result(
     best_mapping: Dict[str, str],
     best_preserved_edges: List[Tuple[str, str]],
-    stats: ArcMatchStats,
+    stats: PruningStats,
     elapsed_ms: float,
     graph1: Graph,
     graph2: Graph,
@@ -90,7 +90,7 @@ def _result(
 def compute_mces_connected(graph1: Graph, graph2: Graph) -> Dict[str, object]:
     """Backtracking MCES that requires the preserved subgraph of graph1 to be connected.
 
-    Uses ArcMatch-style pruning and returns only mappings whose preserved edges
+    Uses pruning and returns only mappings whose preserved edges
     in graph1 induce a single connected component.
     """
 
@@ -101,7 +101,7 @@ def compute_mces_connected(graph1: Graph, graph2: Graph) -> Dict[str, object]:
 
     best_mapping: Dict[str, str] = {}
     best_preserved_edges: List[Tuple[str, str]] = []
-    stats = ArcMatchStats()
+    stats = PruningStats()
 
     if len(nodes1) > len(nodes2):
         elapsed_ms = (time.time() - start) * 1000.0

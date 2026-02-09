@@ -1,10 +1,10 @@
 """
-Unit tests for MCES algorithms (brute force and ArcMatch).
+Unit tests for MCES algorithms (brute force and Pruning).
 Tests validate correctness of MCES computation, edge preservation,
 and performance characteristics.
 """
 from algorithms.brute_force import compute_mces as brute_force_mces
-from algorithms.brute_force_arcmatch import compute_mces as arcmatch_mces
+from algorithms.brute_force_pruning import compute_mces as pruning_mces
 from algorithms.ilp_r2 import compute_mces_ilp_r2
 from core.graph import Graph
 
@@ -123,14 +123,14 @@ class TestBruteForceMCES:
         assert len(result["preserved_edges"]) == 3
 
 
-class TestArcMatchMCES:
-    """Test suite for brute-force + ArcMatch MCES algorithm."""
+class TestPruningMCES:
+    """Test suite for brute-force + Pruning MCES algorithm."""
 
     def test_empty_graphs(self):
         """Test MCES on empty graphs."""
         g1 = Graph()
         g2 = Graph()
-        result = arcmatch_mces(g1, g2)
+        result = pruning_mces(g1, g2)
 
         assert result["mapping"] == {}
         assert result["preserved_edges"] == []
@@ -151,12 +151,12 @@ class TestArcMatchMCES:
         g2.add_edge("1", "2")
         g2.add_edge("2", "3")
 
-        result = arcmatch_mces(g1, g2)
+        result = pruning_mces(g1, g2)
 
         assert len(result["preserved_edges"]) == 2
 
     def test_stats_include_pruning(self):
-        """Test that ArcMatch stats include pruning information."""
+        """Test that Pruning stats include pruning information."""
         g1 = Graph()
         g1.add_node("1")
         g1.add_node("2")
@@ -170,7 +170,7 @@ class TestArcMatchMCES:
         g2.add_node("3")
         g2.add_edge("1", "3")
 
-        result = arcmatch_mces(g1, g2)
+        result = pruning_mces(g1, g2)
 
         assert isinstance(result, dict)
         assert "stats" in result
@@ -188,7 +188,7 @@ class TestArcMatchMCES:
         for i in range(1, 4):
             g2.add_node(str(i))
 
-        result = arcmatch_mces(g1, g2)
+        result = pruning_mces(g1, g2)
 
         assert result["mapping"] == {}
         assert result["preserved_edges"] == []
@@ -198,7 +198,7 @@ class TestAlgorithmConsistency:
     """Test that both algorithms produce consistent results."""
 
     def test_same_result_on_small_graphs(self):
-        """Test that brute force and ArcMatch produce same edge count on small graphs."""
+        """Test that brute force and Pruning produce same edge count on small graphs."""
         g1 = Graph()
         g1.add_node("1")
         g1.add_node("2")
@@ -214,7 +214,7 @@ class TestAlgorithmConsistency:
         g2.add_edge("1", "3")
 
         result_bf = brute_force_mces(g1, g2)
-        result_am = arcmatch_mces(g1, g2)
+        result_am = pruning_mces(g1, g2)
 
         # Both should find the same number of preserved edges
         assert isinstance(result_bf, dict)
