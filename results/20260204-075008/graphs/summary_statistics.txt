@@ -1,0 +1,184 @@
+================================================================================
+ BENCHMARK SUMMARY STATISTICS
+================================================================================
+
+Total executions: 720
+Algorithms tested: 6
+  - bruteforce_pruning, connected_mces, greedy_path_mces, bruteforce, simulated_annealing, ilp_r2
+
+Graph size range:
+  - Nodes: 7 - 12
+  - Edges: 6 - 24
+
+================================================================================
+ STATISTICS PER ALGORITHM
+================================================================================
+
+
+BRUTEFORCE
+--------------------------------------------------------------------------------
+Executions: 120
+
+Execution time (ms):
+  Mean: 27907.52
+  Median: 3687.86
+  Std dev: 45135.23
+  Min: 69.17
+  Max: 142472.09
+
+Memory (MB):
+  Mean: 25.37
+  Std dev: 6.26
+
+Solution quality:
+  Preserved edges (average): 10.24
+  Optimal solutions: 80/120 (100.0%)
+
+⚠ Timeout: 40 executions
+
+Search space:
+  Mappings explored (average): 1009260
+  Recursive calls (average): 0
+  Pruned branches (average): 0
+
+
+BRUTEFORCE_PRUNING
+--------------------------------------------------------------------------------
+Executions: 120
+
+Execution time (ms):
+  Mean: 10107.39
+  Median: 338.01
+  Std dev: 28866.58
+  Min: 1.38
+  Max: 183420.60
+
+Memory (MB):
+  Mean: 27.51
+  Std dev: 4.22
+
+Solution quality:
+  Preserved edges (average): 10.92
+  Optimal solutions: 114/120 (100.0%)
+
+⚠ Timeout: 6 executions
+
+Search space:
+  Mappings explored (average): 7
+  Recursive calls (average): 193632
+  Pruned branches (average): 627477
+
+
+CONNECTED_MCES
+--------------------------------------------------------------------------------
+Executions: 120
+
+Execution time (ms):
+  Mean: 10999.51
+  Median: 569.23
+  Std dev: 25520.40
+  Min: 2.45
+  Max: 138892.24
+
+Memory (MB):
+  Mean: 27.20
+  Std dev: 4.56
+
+Solution quality:
+  Preserved edges (average): 10.92
+  Optimal solutions: 114/120 (100.0%)
+
+⚠ Timeout: 6 executions
+
+Search space:
+  Mappings explored (average): 2018
+  Recursive calls (average): 306922
+  Pruned branches (average): 838270
+
+
+GREEDY_PATH_MCES
+--------------------------------------------------------------------------------
+Executions: 120
+
+Execution time (ms):
+  Mean: 34.26
+  Median: 30.01
+  Std dev: 23.39
+  Min: 3.61
+  Max: 105.83
+
+Memory (MB):
+  Mean: 29.05
+  Std dev: 0.90
+
+Solution quality:
+  Preserved edges (average): 8.93
+  Optimal solutions: 0/120 (0.0%)
+
+Search space:
+  Mappings explored (average): 0
+  Recursive calls (average): 0
+  Pruned branches (average): 0
+
+
+ILP_R2
+--------------------------------------------------------------------------------
+Executions: 120
+
+Execution time (ms):
+  Mean: 1238.59
+  Median: 422.26
+  Std dev: 1837.25
+  Min: 30.94
+  Max: 11119.24
+
+Memory (MB):
+  Mean: 29.15
+  Std dev: 2.21
+
+Solution quality:
+  Preserved edges (average): 5.76
+  Optimal solutions: 120/120 (100.0%)
+
+Search space:
+  Mappings explored (average): 9
+
+
+SIMULATED_ANNEALING
+--------------------------------------------------------------------------------
+Executions: 120
+
+Execution time (ms):
+  Mean: 24.95
+  Median: 24.56
+  Std dev: 9.24
+  Min: 12.03
+  Max: 72.32
+
+Memory (MB):
+  Mean: 29.04
+  Std dev: 1.03
+
+Solution quality:
+  Preserved edges (average): 9.92
+  Optimal solutions: 0/120 (0.0%)
+
+Search space:
+  Mappings explored (average): 225
+
+
+================================================================================
+ DIRECT COMPARISON
+================================================================================
+
+Fastest algorithm (average time):
+  🏆 simulated_annealing: 24.95 ms
+
+Best quality algorithm (preserved edges):
+  🏆 bruteforce_pruning: 10.92 edges
+
+Most memory efficient algorithm:
+  🏆 bruteforce: 25.37 MB
+
+Most reliable algorithm (% optimal solutions):
+  🏆 bruteforce: 100.0%
