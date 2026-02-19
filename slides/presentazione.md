@@ -295,45 +295,11 @@ FUNCTION Perturb(alignment):
 - Grafi **non orientati**
 - Nessun self-loop
 - Connessione minima garantita (ogni nodo ha almeno 1 arco)
-- **Seed casuale**: 9871 per riproducibilità
-
-## Copertura Spazio
-Total runs: $\sum_{n=7}^{12} |\text{edge\_counts}(n)| \times 5 \times 6 \approx 540$ esecuzioni
+- **Seed**: 9871 per riproducibilità
 
 ---
 
-# 4. Parameter Values & Software
-
-<div class="columns">
-<div>
-
-## Parametri Benchmark
-| Parametro | Valore |
-|-----------|--------|
-| N_MIN | 7 |
-| N_MAX | 12 |
-| REPEATS | 5 |
-| EDGE_MULTIPLIERS | [1.2, 1.5, 2.0] |
-| PER_CALL_TIMEOUT | 300s |
-| MAX_WORKERS | 5 |
-| RANDOM_SEED | 9871 |
-
-</div>
-<div>
-
-## Software Stack
-- **Python**: 3.11+
-- **Librerie**: NetworkX, PuLP, psutil
-- **Backend**: Flask API
-- **Environment**: Processo separato per timeout
-- **Parallelizzazione**: ThreadPoolExecutor + multiprocessing
-
-</div>
-</div>
-
----
-
-# 5. Quantitative Performance Metrics
+# 4. Quantitative Performance Metrics
 
 ## Metriche Primarie
 1. **Preserved Edges Count**: Numero archi preservati (qualità soluzione)
@@ -349,62 +315,43 @@ Total runs: $\sum_{n=7}^{12} |\text{edge\_counts}(n)| \times 5 \times 6 \approx 
 
 ---
 
-# 6. Secondary Measures
-
-## Requisiti Computazionali
-- **Timeout handling**: Processo separato con terminazione forzata
-- **Parallelizzazione**: ThreadPoolExecutor per esecuzioni concorrenti
-- **File locking**: Scrittura thread-safe su CSV
-
-## User-Friendliness
-- **Configurazione**: Parametri in cima a `benchmark.py`
-- **Output**: CSV incrementale con metadati JSON
-- **Logging**: Progress real-time `[idx/total]`
-
-## Documentazione
-- README.md completo
-- Docstring per ogni algoritmo
-- Schema dati consistente (mapping, preserved_edges, stats)
-
----
-
-# Results: Performance Summary
+# 5.1 Results: Performance Summary
 
 ![Performance Summary](img/performance_summary.svg)
 
 ---
 
-# Results: Time vs Graph Size
+# 5.2 Results: Time vs Graph Size
 
 ![Time vs Graph Size](img/time_vs_graph_size.svg)
 
 ---
 
-# Results: Time vs Edges
+# 5.3 Results: Time vs Edges
 
 ![Time vs Edges](img/time_vs_edges.svg)
 
 ---
 
-# Results: Heatmap Time by Size
+# 5.4 Results: Heatmap Time by Size
 
 ![Heatmap Time by Size](img/heatmap_time_by_size.svg)
 
 ---
 
-# Results: Search Space Exploration
+# 5.5 Results: Search Space Exploration
 
 ![Search Space Exploration](img/search_space_exploration.svg)
 
 ---
 
-# Results: Timeout Analysis
+# 5.6 Results: Timeout Analysis
 
 ![Timeout Analysis](img/timeout_analysis.svg)
 
 ---
 
-# 7. Results Interpretation
+# 6. Results Interpretation
 
 ## Prospettiva Utente
 **Quando usare ciascun algoritmo?**
@@ -422,7 +369,7 @@ Total runs: $\sum_{n=7}^{12} |\text{edge\_counts}(n)| \times 5 \times 6 \approx 
 
 ---
 
-# 8. Accessible Format
+# 7. Accessible Format
 
 ## Formato Output
 - **CSV**: `benchmark_results.csv` con una riga per run
@@ -436,10 +383,10 @@ Total runs: $\sum_{n=7}^{12} |\text{edge\_counts}(n)| \times 5 \times 6 \approx 
 
 ---
 
-# 9. Future Extensions
+# 8. Future Extensions
 
 ## Design Estensibile
-- **Nuovi algoritmi**: Basta aggiungere funzione alla lista `algorithms`
+- **Nuovi algoritmi**: Aggiungere funzione alla lista `algorithms`
 - **Nuove metriche**: Estendere dizionario `stats`
 - **Range parametri**: Variabili configurabili in cima al file
 
@@ -453,7 +400,7 @@ Total runs: $\sum_{n=7}^{12} |\text{edge\_counts}(n)| \times 5 \times 6 \approx 
 
 ---
 
-# 10. Reproducible Research
+# 9. Reproducible Research
 
 ## Best Practices Implementate
 
